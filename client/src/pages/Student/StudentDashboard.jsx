@@ -172,7 +172,7 @@ const StudentDashboard = () => {
     <div>
       <div className="welcome-banner">
         <h2>👋 {t('welcome_back')}, {user?.name?.split(' ')[0]}!</h2>
-        <p>{t('dashboard_subtitle')}</p>
+        <p>{t('studydesk.space')}</p>
       </div>
 
       <div className="stats-row">
@@ -228,21 +228,21 @@ const StudentDashboard = () => {
 
       <div className="section-header" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <h2 className="section-title" style={{ margin: 0 }}>{t('available_quizzes')}</h2>
-        
+
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', width: '100%' }}>
-          <Input 
-            prefix={<SearchOutlined />} 
-            placeholder="Search quizzes, courses, or lessons..." 
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder="Search quizzes, courses, or lessons..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ maxWidth: 300, flex: 1 }}
             size="large"
             allowClear
           />
-          <Select 
-            value={sortBy} 
-            onChange={setSortBy} 
-            size="large" 
+          <Select
+            value={sortBy}
+            onChange={setSortBy}
+            size="large"
             style={{ minWidth: 160 }}
             suffixIcon={<SortAscendingOutlined />}
             options={[
