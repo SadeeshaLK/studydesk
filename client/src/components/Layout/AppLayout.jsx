@@ -16,6 +16,7 @@ import {
   SettingOutlined,
   CrownOutlined,
   WalletOutlined,
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -58,6 +59,7 @@ const AppLayout = () => {
     { key: '/student/quizzes', icon: <FileTextOutlined />, label: t('quizzes') },
     { key: '/student/wallet', icon: <WalletOutlined />, label: 'Wallet' },
     { key: '/student/results', icon: <BarChartOutlined />, label: t('results') },
+    { key: '/student/gpa-calculator', icon: <CalculatorOutlined />, label: 'GPA Calculator' },
   ];
 
   const lecturerMenuItems = [

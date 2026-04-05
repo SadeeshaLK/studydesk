@@ -12,6 +12,7 @@ import QuizAttempt from './pages/Student/QuizAttempt';
 import QuizResult from './pages/Student/QuizResult';
 import ResultsHistory from './pages/Student/ResultsHistory';
 import StudentWallet from './pages/Student/StudentWallet';
+import GPACalculator from './pages/Student/GPACalculator';
 import LecturerDashboard from './pages/Lecturer/LecturerDashboard';
 import QuizManager from './pages/Lecturer/QuizManager';
 import QuizEditor from './pages/Lecturer/QuizEditor';
@@ -57,6 +58,7 @@ const AppRoutes = () => {
         <Route path="result/:id" element={<QuizResult />} />
         <Route path="results" element={<ResultsHistory />} />
         <Route path="wallet" element={<StudentWallet />} />
+        <Route path="gpa-calculator" element={<GPACalculator />} />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 

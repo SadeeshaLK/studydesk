@@ -1,0 +1,10 @@
+ques/
+server/.env
+server/node_modules/
+client/node_modules/
+client/dist/
+.DS_Store
+*.log
+**/node_modules/
+**/dist/
+**/.env
