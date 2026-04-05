@@ -1,6 +1,7 @@
 const Quiz = require('../models/Quiz');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
+const { sendEmail, paymentSubmittedEmail } = require('../utils/emailService');
 
 // @desc    Top up wallet balance
 // @route   POST /api/payments/topup
@@ -86,6 +87,9 @@ exports.manualTopUp = async (req, res) => {
         status: payment.status
       }
     });
+
+    // Send payment submitted email (async, non-blocking)
+    sendEmail(req.user.email, paymentSubmittedEmail(req.user.name, amount, payment.transactionId)).catch(() => {});
   } catch (error) {
     console.error('Manual Top up error:', error);
     res.status(500).json({ message: 'Failed to upload manual payment. Please try again.' });

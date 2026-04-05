@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
+const { sendEmail, registrationEmail } = require('../utils/emailService');
 
 // Generate JWT
 const generateToken = (userId) => {
@@ -29,6 +30,9 @@ exports.register = async (req, res) => {
     // Always register as student — lecturers are promoted by admin
     const user = await User.create({ name, email, password, role: 'student' });
     const token = generateToken(user._id);
+
+    // Send welcome email (async, non-blocking)
+    sendEmail(email, registrationEmail(name, email)).catch(() => {});
 
     res.status(201).json({
       message: 'Registration successful!',

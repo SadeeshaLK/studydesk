@@ -1,5 +1,7 @@
 const Submission = require('../models/Submission');
 const Quiz = require('../models/Quiz');
+const User = require('../models/User');
+const { sendEmail, quizResultEmail } = require('../utils/emailService');
 
 // @desc    Submit quiz answers
 // @route   POST /api/submissions
@@ -107,6 +109,12 @@ exports.submitQuiz = async (req, res) => {
         quizTitle: quiz.title
       }
     });
+
+    // Send quiz result email (async, non-blocking)
+    const student = await User.findById(req.user._id);
+    if (student) {
+      sendEmail(student.email, quizResultEmail(student.name, quiz.title, score, totalMarks, percentage, passed)).catch(() => {});
+    }
   } catch (error) {
     console.error('Submit quiz error:', error);
     res.status(500).json({ message: 'Failed to submit quiz.' });

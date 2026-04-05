@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Quiz = require('../models/Quiz');
 const Submission = require('../models/Submission');
 const Payment = require('../models/Payment');
+const { sendEmail, paymentApprovedEmail } = require('../utils/emailService');
 
 // @desc    Get admin dashboard stats
 // @route   GET /api/admin/dashboard
@@ -225,6 +226,9 @@ exports.approveManualPayment = async (req, res) => {
     await payment.save();
 
     res.json({ message: 'Payment approved successfully.', payment, walletBalance: user.walletBalance });
+
+    // Send receipt email to student (async, non-blocking)
+    sendEmail(user.email, paymentApprovedEmail(user.name, payment.amount, payment.transactionId, user.walletBalance)).catch(() => {});
   } catch (error) {
     console.error('Approve manual payment error:', error);
     res.status(500).json({ message: 'Failed to approve payment.' });
