@@ -1,23 +1,6 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Create reusable transporter with explicit SMTP settings
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // use STARTTLS
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-};
+// Resend HTTP API — works on Render free tier (no SMTP needed)
 
 // Base template wrapper
 const baseTemplate = (content, previewText = '') => `
@@ -276,21 +259,27 @@ const quizResultEmail = (userName, quizTitle, score, totalMarks, percentage, pas
 
 // ========== SEND EMAIL FUNCTION ==========
 const sendEmail = async (to, emailData) => {
-  // Skip if email credentials are not configured
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log(`[Email] ⚠️ Skipped (no credentials configured). Would have sent to: ${to}`);
+  // Skip if Resend API key is not configured
+  if (!process.env.RESEND_API_KEY) {
+    console.log(`[Email] ⚠️ Skipped (no RESEND_API_KEY configured). Would have sent to: ${to}`);
     return false;
   }
 
   try {
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: `"📚 StudyDesk" <${process.env.EMAIL_USER}>`,
-      to,
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { data, error } = await resend.emails.send({
+      from: `StudyDesk <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
+      to: [to],
       subject: emailData.subject,
       html: emailData.html
     });
-    console.log(`[Email] ✅ Sent to ${to}: ${emailData.subject}`);
+
+    if (error) {
+      console.error(`[Email] ❌ Failed to send to ${to}:`, error.message);
+      return false;
+    }
+
+    console.log(`[Email] ✅ Sent to ${to}: ${emailData.subject} (ID: ${data?.id})`);
     return true;
   } catch (error) {
     console.error(`[Email] ❌ Failed to send to ${to}:`, error.message);
