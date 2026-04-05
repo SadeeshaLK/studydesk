@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SE2020 – Lab 05 + Lecture 10 MCQ | Advanced DOM & Node.js</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --card: #161d2e; --border: #1f2d45;
+    --accent: #3b82f6; --accent2: #06b6d4; --gold: #f59e0b;
+    --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  .header { text-align:center; padding:3rem 0 2rem; }
+  .course-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent2); border:1px solid var(--accent2); padding:0.3rem 0.8rem; border-radius:2px; margin-bottom:1.2rem; text-transform:uppercase; }
+  h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.1; background:linear-gradient(135deg,#e2e8f0 0%,#3b82f6 60%,#06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.6rem; }
+  .subtitle { color:var(--muted); font-size:0.95rem; font-weight:300; }
+  .stats-bar { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:2rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.4rem; text-align:center; min-width:100px; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent); display:block; }
+  .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .progress-wrap { background:var(--border); border-radius:99px; height:6px; margin:1.5rem 0 2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.5s ease; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right; margin-bottom:0.4rem; }
+  .section-divider { text-align:center; margin:2.5rem 0 1.5rem; }
+  .section-divider span { font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent2); background:var(--card); border:1px solid var(--border); padding:0.4rem 1.2rem; border-radius:20px; }
+  .question-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; margin-bottom:1.5rem; transition:border-color 0.2s; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-card:hover { border-color:rgba(59,130,246,0.3); }
+  .q-meta { display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent2); background:rgba(6,182,212,0.1); padding:0.2rem 0.6rem; border-radius:4px; }
+  .q-topic { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .q-text { font-size:1.05rem; font-weight:500; line-height:1.6; color:var(--text); margin-bottom:1.4rem; }
+  .q-text pre { font-family:'DM Mono',monospace; background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:8px; padding:1rem; font-size:0.82rem; color:#93c5fd; line-height:1.7; overflow-x:auto; margin:0.8rem 0; white-space:pre; }
+  .options { display:flex; flex-direction:column; gap:0.6rem; }
+  .option { display:flex; align-items:flex-start; gap:0.8rem; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s ease; background:transparent; text-align:left; width:100%; color:var(--dim); font-size:0.95rem; font-family:'DM Sans',sans-serif; line-height:1.5; }
+  .option:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:rgba(59,130,246,0.06); }
+  .option .opt-key { font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:4px; margin-top:1px; flex-shrink:0; opacity:0.7; }
+  .option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); color:var(--green); }
+  .option.wrong { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+  .option.reveal-correct { border-color:var(--green); background:rgba(16,185,129,0.05); color:var(--green); }
+  .option:disabled { cursor:default; }
+  .explanation { margin-top:1rem; padding:0.9rem 1rem; background:rgba(59,130,246,0.07); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:0.88rem; color:var(--dim); line-height:1.6; display:none; }
+  .explanation.show { display:block; animation:fadeUp 0.2s ease; }
+  .explanation strong { color:var(--accent2); }
+  .code { font-family:'DM Mono',monospace; background:rgba(0,0,0,0.3); padding:0.15rem 0.4rem; border-radius:3px; font-size:0.85em; color:#93c5fd; }
+  .controls { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:2.5rem; }
+  .btn { font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; padding:0.8rem 2rem; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.03em; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--dim); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  #result-screen { display:none; text-align:center; padding:4rem 2rem; background:var(--card); border:1px solid var(--border); border-radius:16px; animation:fadeUp 0.4s ease; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:4px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 1.5rem; background:rgba(59,130,246,0.08); box-shadow:0 0 40px rgba(59,130,246,0.2); }
+  .score-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--accent); }
+  .score-total { font-size:0.8rem; color:var(--muted); }
+  .result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .result-msg { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .result-breakdown { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+  .breakdown-item { padding:0.7rem 1.2rem; border-radius:8px; font-size:0.85rem; font-weight:500; }
+  .bd-correct { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+  .bd-wrong   { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+  .bd-skip    { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid rgba(100,116,139,0.3); }
+  .mode-bar { display:flex; gap:0.5rem; justify-content:center; margin-bottom:2rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.4rem; }
+  .mode-btn { flex:1; padding:0.5rem; border:none; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .mode-btn.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  @media(max-width:600px) { .question-card{padding:1.2rem} h1{font-size:1.6rem} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="course-badge">SE2020 · Web & Mobile Technologies · SLIIT</div>
+    <h1>Lab 05 + Lecture 10 — MCQ Prep</h1>
+    <p class="subtitle">Advanced DOM Manipulation · Node.js · Async JS · Event Loop · npm · fs Module &nbsp;·&nbsp; 35 Questions &nbsp;·&nbsp; 5 Options Each</p>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('practice')" id="mode-practice">🎯 Practice (instant feedback)</button>
+    <button class="mode-btn" onclick="setMode('exam')" id="mode-exam">📝 Exam (submit at end)</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-answered">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label">Wrong</span></div>
+    <div class="stat"><span class="stat-num" id="stat-remaining">35</span><span class="stat-label">Remaining</span></div>
+  </div>
+
+  <div class="progress-label" id="progress-label">0 / 35 completed</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="quiz-container"></div>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="shuffleAndReset()">🔀 Shuffle & Restart</button>
+    <button class="btn btn-primary" onclick="submitExam()" id="submit-btn" style="display:none">Submit Exam</button>
+    <button class="btn btn-primary" onclick="showResults()" id="results-btn">📊 View Score</button>
+  </div>
+
+  <div id="result-screen">
+    <div class="score-circle">
+      <span class="score-num" id="final-score">0</span>
+      <span class="score-total" id="final-total">/ 35</span>
+    </div>
+    <div class="result-title" id="result-title">—</div>
+    <div class="result-msg" id="result-msg">—</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item bd-correct" id="bd-correct">✅ 0 Correct</div>
+      <div class="breakdown-item bd-wrong"   id="bd-wrong">❌ 0 Wrong</div>
+      <div class="breakdown-item bd-skip"    id="bd-skip">⬜ 0 Skipped</div>
+    </div>
+    <button class="btn btn-primary" onclick="shuffleAndReset()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION A — LAB 05: ADVANCED DOM MANIPULATION
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── DOM Traversal ──────────────────────────────────────────────────────────
+  {
+    topic: "DOM Traversal",
+    q: "What does <code>form.parentNode</code> return?",
+    opts: [
+      "All child elements inside the form",
+      "The HTML element that directly contains the form",
+      "The first sibling element of the form",
+      "All input elements inside the form",
+      "The document root element"
+    ],
+    answer: 1,
+    explain: "<strong>parentNode</strong> is a DOM property that navigates <em>up</em> the tree and returns the direct parent element of the selected node. In this case, <code class='code'>form.parentNode</code> gives you whatever element wraps the form (e.g., a &lt;div&gt; or &lt;body&gt;)."
+  },
+
+  {
+    topic: "DOM Traversal",
+    q: "What does <code>form.children</code> return?",
+    opts: [
+      "Only the text nodes inside the form",
+      "An HTMLCollection of all direct child elements of the form",
+      "A reference to the form's parent element",
+      "Only input elements of type text",
+      "The number of child nodes in the form"
+    ],
+    answer: 1,
+    explain: "<strong>children</strong> returns an <strong>HTMLCollection</strong> of all direct child <em>elements</em> (not text nodes) of the specified element. It is live — it automatically updates when the DOM changes."
+  },
+
+  {
+    topic: "DOM Traversal",
+    q: "What does the following code do?\n<pre>let inputs = form.children;\nfor (let i = 0; i &lt; inputs.length; i++) {\n  if (inputs[i].tagName === \"INPUT\") {\n    inputs[i].style.backgroundColor = \"#eef\";\n  }\n}</pre>",
+    opts: [
+      "Loops over all form children and hides any that are input fields",
+      "Removes all INPUT elements from the form",
+      "Loops over the form's children and changes the background color of INPUT elements",
+      "Submits the form if all INPUT elements are filled",
+      "Adds a new INPUT element to the form for each existing one"
+    ],
+    answer: 2,
+    explain: "The loop iterates over every direct child of the form. <strong>tagName === \"INPUT\"</strong> checks if the child is an input element. When true, its <strong>backgroundColor</strong> is set to <code class='code'>\"#eef\"</code> — a bulk DOM style manipulation using DOM traversal."
+  },
+
+  // ── Dynamic Elements & Counter ─────────────────────────────────────────────
+  {
+    topic: "Dynamic Elements",
+    q: "What does this code create and where does it appear?\n<pre>let countPara = document.createElement(\"p\");\ncountPara.id = \"travelerCount\";\ncountPara.innerText = \"Total Registered Travelers: 0\";\ndocument.body.appendChild(countPara);</pre>",
+    opts: [
+      "Creates a table row and appends it to the traveler table",
+      "Creates a paragraph element with id 'travelerCount' and adds it to the end of the page body",
+      "Creates a hidden div that stores the traveler count in memory",
+      "Creates a counter inside the form and prevents submission if count is 0",
+      "Creates a heading element and inserts it before the form"
+    ],
+    answer: 1,
+    explain: "<strong>document.createElement(\"p\")</strong> creates a new paragraph node. Setting its <strong>id</strong> and <strong>innerText</strong> configures it. <strong>document.body.appendChild()</strong> inserts it as the last child of &lt;body&gt;, making it appear at the bottom of the page."
+  },
+
+  {
+    topic: "Dynamic Elements",
+    q: "In the updateCount() function below, why is 1 subtracted from table.rows.length?\n<pre>function updateCount() {\n  let count = table.rows.length - 1;\n  countPara.innerText = \"Total Registered Travelers: \" + count;\n}</pre>",
+    opts: [
+      "Because the first row was deleted by the user",
+      "Because table.rows always returns one extra phantom row",
+      "Because the table has a header row that should not be counted as a traveler",
+      "Because the last row is always a footer and must be excluded",
+      "Because JavaScript arrays are zero-indexed so 1 must be subtracted"
+    ],
+    answer: 2,
+    explain: "<strong>table.rows</strong> includes <em>all</em> rows — including the header row (&lt;tr&gt; containing &lt;th&gt; elements). Subtracting 1 ensures only the <strong>data rows</strong> (actual traveler entries) are counted, not the header."
+  },
+
+  {
+    topic: "Dynamic Elements",
+    q: "When should <code>updateCount()</code> be called to keep the traveler count accurate?",
+    opts: [
+      "Only when the page first loads",
+      "Only when a traveler is added",
+      "Only when a traveler is deleted",
+      "Both after adding a traveler and after deleting a traveler",
+      "On every keyup event in the form"
+    ],
+    answer: 3,
+    explain: "The counter must reflect the current number of rows at all times. It should be called <strong>both after adding</strong> a traveler (row inserted) <strong>and after deleting</strong> one (row removed), so the display is always in sync."
+  },
+
+  // ── Conditional Styling ────────────────────────────────────────────────────
+  {
+    topic: "Conditional Styling",
+    q: "What background color does a row get for a traveler aged 15, according to this code?\n<pre>if (age &lt; 18) {\n  row.style.backgroundColor = \"#fff3cd\";\n} else if (age &gt;= 60) {\n  row.style.backgroundColor = \"#d1ecf1\";\n}</pre>",
+    opts: [
+      "#d1ecf1 — because 15 is less than 60",
+      "No color — the row stays default",
+      "#fff3cd — because 15 is less than 18",
+      "#ff0000 — the default error color",
+      "#d1ecf1 — because seniors and minors share the same style"
+    ],
+    answer: 2,
+    explain: "Age 15 satisfies <strong>age &lt; 18</strong>, so the first condition is true and the row background is set to <strong>#fff3cd</strong> (a light yellow). The else-if branch for seniors is never reached."
+  },
+
+  {
+    topic: "Conditional Styling",
+    q: "A traveler is 72 years old. What happens to their table row?",
+    opts: [
+      "The row is highlighted yellow (#fff3cd)",
+      "The row is highlighted light blue (#d1ecf1)",
+      "The row is deleted automatically",
+      "The row stays white because 72 is not less than 18",
+      "The form submission is blocked"
+    ],
+    answer: 1,
+    explain: "Age 72 does NOT satisfy <code class='code'>age &lt; 18</code>, but it DOES satisfy <code class='code'>age &gt;= 60</code>, so the else-if branch runs and sets the row's background to <strong>#d1ecf1</strong> (light blue — the senior colour)."
+  },
+
+  // ── Real-Time Validation ───────────────────────────────────────────────────
+  {
+    topic: "Form Validation",
+    q: "Which DOM method is used here and what does it select?\n<pre>let submitBtn = document.querySelector(\"input[type='submit']\");</pre>",
+    opts: [
+      "getElementById — selects by the element's id attribute",
+      "getElementsByTagName — selects all input elements",
+      "querySelector — selects the first element matching the CSS attribute selector",
+      "querySelectorAll — selects every submit button on the page",
+      "getElementsByClassName — selects all elements of class 'submit'"
+    ],
+    answer: 2,
+    explain: "<strong>querySelector()</strong> accepts a full CSS selector string and returns the <em>first</em> matching element. <code class='code'>input[type='submit']</code> is a CSS attribute selector that targets the first input whose type attribute equals 'submit'."
+  },
+
+  {
+    topic: "Form Validation",
+    q: "In the validateForm() function, what does <code>nameInput.value.trim() === \"\"</code> check?",
+    opts: [
+      "Whether the name field contains the word 'trim'",
+      "Whether the name input has more than zero characters",
+      "Whether the name input is empty or contains only whitespace",
+      "Whether the name starts with an uppercase letter",
+      "Whether the input has a placeholder attribute set"
+    ],
+    answer: 2,
+    explain: "<strong>.trim()</strong> removes leading and trailing whitespace from the string. Comparing to <code class='code'>\"\"</code> then checks if the result is an empty string — meaning the field is either completely empty <em>or</em> only filled with spaces."
+  },
+
+  {
+    topic: "Form Validation",
+    q: "What does <code>submitBtn.disabled = !valid</code> do at the end of validateForm()?",
+    opts: [
+      "Submits the form if valid is true",
+      "Enables the submit button when valid is false and disables it when valid is true",
+      "Disables the submit button when valid is false and enables it when valid is true",
+      "Hides the submit button if the form has errors",
+      "Resets the form to its initial state"
+    ],
+    answer: 2,
+    explain: "<code class='code'>!valid</code> is the logical NOT of the valid flag. When <strong>valid = false</strong> (errors exist), <code class='code'>!valid = true</code> so <strong>disabled = true</strong> — the button is locked. When <strong>valid = true</strong>, <code class='code'>!valid = false</code> so disabled = false and the button becomes clickable."
+  },
+
+  {
+    topic: "Form Validation",
+    q: "Which condition correctly validates the age field in the validateForm() function?",
+    opts: [
+      "<code>if (ageInput.value === 0)</code>",
+      "<code>if (isNaN(ageVal) || ageVal &lt;= 0)</code>",
+      "<code>if (ageInput.value.trim() === \"\")</code>",
+      "<code>if (!ageInput.includes(\"@\"))</code>",
+      "<code>if (ageVal &lt; 18 || ageVal &gt; 60)</code>"
+    ],
+    answer: 1,
+    explain: "<strong>isNaN(ageVal)</strong> catches non-numeric input (e.g., letters). <strong>ageVal &lt;= 0</strong> catches zero or negative numbers. Together they ensure the age is a real positive number. The string-empty check is for name; the @ check is for email."
+  },
+
+  {
+    topic: "Form Validation",
+    q: "How is the validateForm() function triggered while the user types in any input field?",
+    opts: [
+      "Using onclick on each input",
+      "Using onsubmit on the form",
+      "Using onkeyup on each input field",
+      "Using onchange on the form element",
+      "Using onblur on the submit button"
+    ],
+    answer: 2,
+    explain: "The lab assigns <code class='code'>nameInput.onkeyup = validateForm</code> (and the same for ageInput and emailInput). <strong>onkeyup</strong> fires every time the user releases a key — enabling <em>real-time</em> validation as they type."
+  },
+
+  // ── Dynamic Filtering ──────────────────────────────────────────────────────
+  {
+    topic: "Dynamic Filtering",
+    q: "In the age filter code, what does <code>rows[i].style.display = \"table-row\"</code> do?",
+    opts: [
+      "Hides the row from the table",
+      "Deletes the row from the DOM",
+      "Makes the row visible as a proper table row",
+      "Changes the row's background color to match the filter",
+      "Inserts a new row below the current one"
+    ],
+    answer: 2,
+    explain: "Setting <code class='code'>display = \"table-row\"</code> restores a row's visibility. Table rows should use <strong>\"table-row\"</strong> (not simply \"block\") as their display value so that the table layout renders correctly."
+  },
+
+  {
+    topic: "Dynamic Filtering",
+    q: "What does this filtering condition mean?\n<pre>if (filter === \"adult\" && (age &lt; 18 || age &gt;= 60))\n  rows[i].style.display = \"none\";</pre>",
+    opts: [
+      "Hides rows where the traveler is between 18 and 59 (adult range)",
+      "Shows only rows where the traveler is under 18 or 60+",
+      "When the 'adult' filter is selected, hides rows whose age is NOT in the 18–59 range",
+      "Deletes all non-adult rows from the table",
+      "Highlights adult rows with a different color"
+    ],
+    answer: 2,
+    explain: "When filter is 'adult', the code should show only rows where 18 ≤ age &lt; 60. So it <strong>hides</strong> (display = none) rows where age is either &lt; 18 OR ≥ 60 — i.e., anyone who is NOT an adult."
+  },
+
+  {
+    topic: "Dynamic Filtering",
+    q: "The filter loop starts at <code>i = 1</code> instead of <code>i = 0</code>. Why?",
+    opts: [
+      "Because JavaScript arrays are 1-indexed by default",
+      "Because the first row (index 0) is the header row and should not be filtered",
+      "Because the first row always contains the admin user and must stay visible",
+      "Because rows[0] is always undefined in a table",
+      "To skip the last row which is a footer"
+    ],
+    answer: 1,
+    explain: "Index 0 is the <strong>header row</strong> (containing &lt;th&gt; elements like Name, Age, Email). Starting the loop at <strong>i = 1</strong> skips the header so only actual data rows are shown or hidden by the filter."
+  },
+
+  // ── Event Delegation ───────────────────────────────────────────────────────
+  {
+    topic: "Event Delegation",
+    q: "What does the following event delegation code do?\n<pre>table.addEventListener(\"click\", function (e) {\n  if (e.target.tagName === \"BUTTON\") {\n    let row = e.target.parentNode.parentNode;\n    row.remove();\n    updateCount();\n  }\n});</pre>",
+    opts: [
+      "Adds a new row when any cell in the table is clicked",
+      "Listens on the table; when a BUTTON inside is clicked, it removes that button's row",
+      "Highlights the clicked row in yellow",
+      "Submits the form when the table is clicked",
+      "Prevents any click events inside the table from firing"
+    ],
+    answer: 1,
+    explain: "A single listener is placed on the <strong>table</strong>. When a click bubbles up, <code class='code'>e.target</code> is the actual clicked element. If it's a BUTTON, we navigate up the DOM: <code class='code'>parentNode</code> → &lt;td&gt;, second <code class='code'>parentNode</code> → &lt;tr&gt;. Then <code class='code'>row.remove()</code> deletes the row."
+  },
+
+  {
+    topic: "Event Delegation",
+    q: "What is the main advantage of event delegation over attaching individual onclick handlers to each Delete button?",
+    opts: [
+      "Event delegation is faster because it skips the DOM tree entirely",
+      "Individual handlers cannot be assigned to dynamically created elements, but delegation works for all current and future elements",
+      "Delegation prevents the form from submitting accidentally",
+      "Individual handlers use more CSS memory than delegation",
+      "Delegation automatically validates the form before deleting"
+    ],
+    answer: 1,
+    explain: "When buttons are created dynamically (after page load), attaching individual onclick at creation time works but is expensive and messy at scale. <strong>Event delegation</strong> puts ONE listener on a parent element. Because events bubble up, it captures clicks from <em>any</em> button — even ones created after the listener was set."
+  },
+
+  {
+    topic: "Event Delegation",
+    q: "In the delegation handler, why is <code>e.target.parentNode.parentNode</code> used to find the row?",
+    opts: [
+      "Because e.target refers to the table element, not the button",
+      "Because the button is two levels above the row in the DOM tree",
+      "Because the button is inside a &lt;td&gt; which is inside a &lt;tr&gt;, so two parentNode steps reach the row",
+      "Because parentNode must be called twice to skip text nodes",
+      "Because the row is stored in a global variable and parentNode retrieves it"
+    ],
+    answer: 2,
+    explain: "The DOM structure is: &lt;tr&gt; → &lt;td&gt; → &lt;button&gt;. <code class='code'>e.target</code> is the &lt;button&gt;. One <strong>parentNode</strong> gives the &lt;td&gt;. A second <strong>parentNode</strong> gives the &lt;tr&gt; — the row we want to remove."
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION B — LECTURE 10: NODE.JS & ASYNCHRONOUS JAVASCRIPT
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Async JS ──────────────────────────────────────────────────────────────
+  {
+    topic: "Asynchronous JavaScript",
+    q: "JavaScript is described as 'single-threaded'. What does this mean?",
+    opts: [
+      "JavaScript can only run in a single browser tab at a time",
+      "JavaScript can only process one line of code at a time on one execution thread",
+      "JavaScript cannot handle any asynchronous operations",
+      "JavaScript files can only have one function defined",
+      "JavaScript can only connect to a single server at a time"
+    ],
+    answer: 1,
+    explain: "JavaScript uses a <strong>single execution thread</strong> — meaning only one piece of code runs at a time. However, it achieves concurrency through the <strong>Non-Blocking I/O (NIO) model</strong> and the event loop, offloading async tasks without spawning new threads."
+  },
+
+  {
+    topic: "Asynchronous JavaScript",
+    q: "What is the Non-Blocking I/O (NIO) model in JavaScript?",
+    opts: [
+      "JavaScript pauses execution and waits for each I/O operation to complete",
+      "JavaScript spawns a new thread for each I/O operation",
+      "JavaScript initiates I/O operations and continues executing other code without waiting for them to finish",
+      "JavaScript blocks all events until the current function returns",
+      "JavaScript copies all I/O data into RAM before processing it"
+    ],
+    answer: 2,
+    explain: "In the <strong>Non-Blocking I/O</strong> model, when JavaScript starts an operation like a file read or API request, it does <em>not</em> wait. It continues executing the next statements. The operation's result is handled later through a callback or promise."
+  },
+
+  {
+    topic: "Asynchronous JavaScript",
+    q: "What is a callback in JavaScript?",
+    opts: [
+      "A function that calls itself recursively",
+      "A function passed as an argument to another function, executed after an async operation completes",
+      "A return statement that sends data back to the caller",
+      "A built-in method that cancels a running operation",
+      "An error handler that runs when an exception is thrown"
+    ],
+    answer: 1,
+    explain: "A <strong>callback</strong> is a function passed as an argument to another function. It is <em>called back</em> at a later time — typically when an asynchronous operation (like a timer, file read, or API response) finishes."
+  },
+
+  {
+    topic: "Asynchronous JavaScript",
+    q: "Given this code, what is printed FIRST to the console?\n<pre>console.log(\"Start\");\nsetTimeout(function() {\n  console.log(\"Timeout done\");\n}, 2000);\nconsole.log(\"End\");</pre>",
+    opts: [
+      "Timeout done",
+      "End",
+      "Start",
+      "Start then Timeout done simultaneously",
+      "Nothing — the code throws an error"
+    ],
+    answer: 2,
+    explain: "<code class='code'>console.log(\"Start\")</code> is <em>synchronous</em> and executes first. The setTimeout callback is scheduled asynchronously. <code class='code'>console.log(\"End\")</code> runs next. Only after 2 seconds does <em>\"Timeout done\"</em> appear. So: <strong>Start → End → Timeout done</strong>."
+  },
+
+  // ── Event Loop ────────────────────────────────────────────────────────────
+  {
+    topic: "Event Loop",
+    q: "What is the purpose of the Event Loop in Node.js?",
+    opts: [
+      "To execute synchronous code in parallel threads",
+      "To allow Node.js to handle multiple operations without blocking execution",
+      "To restart Node.js when an error occurs",
+      "To manage the HTTP response queue only",
+      "To compile JavaScript code into machine code before running"
+    ],
+    answer: 1,
+    explain: "The <strong>Event Loop</strong> is the core mechanism that lets Node.js handle many concurrent operations on a single thread. It continuously checks the call stack and the callback queue, moving callbacks to be executed when the stack is empty."
+  },
+
+  {
+    topic: "Event Loop",
+    q: "In the event-driven model, what is an 'event emitter'?",
+    opts: [
+      "An HTML element that fires mouse events",
+      "A Node.js object that triggers named events that listeners can respond to",
+      "A CSS animation that emits visual transitions",
+      "A database connection that sends query results",
+      "A timer that repeatedly runs a callback"
+    ],
+    answer: 1,
+    explain: "An <strong>Event Emitter</strong> is an object in Node.js (from the built-in <code class='code'>events</code> module) that can <em>emit</em> named events. <em>Event listeners</em> register to those events with callback functions that run when the event is emitted."
+  },
+
+  // ── Node.js Introduction ───────────────────────────────────────────────────
+  {
+    topic: "Node.js Introduction",
+    q: "Which best describes Node.js?",
+    opts: [
+      "A front-end JavaScript framework for building user interfaces",
+      "A relational database management system written in JavaScript",
+      "An open-source, cross-platform runtime environment that runs JavaScript on the server side",
+      "A CSS preprocessor that compiles to standard CSS",
+      "A browser plugin that extends JavaScript capabilities in the browser"
+    ],
+    answer: 2,
+    explain: "<strong>Node.js</strong> is an open-source, cross-platform <strong>runtime environment</strong> built on Chrome's V8 engine. It allows JavaScript to run <em>outside</em> the browser — on servers and in network applications."
+  },
+
+  {
+    topic: "Node.js Introduction",
+    q: "Who created Node.js and what was the original motivation?",
+    opts: [
+      "Brendan Eich, to bring JavaScript to mobile platforms",
+      "Ryan Dahl, to build fast web applications needing live updates like chat apps",
+      "Linus Torvalds, to provide server-side scripting for Linux",
+      "Tim Berners-Lee, to extend the capabilities of HTML",
+      "Douglas Crockford, to replace PHP for server-side scripting"
+    ],
+    answer: 1,
+    explain: "<strong>Ryan Dahl</strong> created Node.js with the goal of building fast, interactive web applications that need real-time, live updates — like chat applications using WebSockets."
+  },
+
+  {
+    topic: "Node.js Introduction",
+    q: "How does Node.js handle a huge number of simultaneous connections differently from traditional servers?",
+    opts: [
+      "Node.js opens a new process for each connection",
+      "Node.js spawns a new OS thread for every incoming connection",
+      "Node.js handles all connections on a single thread using non-blocking I/O, avoiding memory exhaustion",
+      "Node.js queues all connections and processes them strictly one by one",
+      "Node.js rejects connections beyond a fixed limit of 1000"
+    ],
+    answer: 2,
+    explain: "Traditional servers (like Apache) spawn a new thread per connection, which quickly exhausts memory. <strong>Node.js uses a single thread with non-blocking I/O</strong>. Each connection is handled via an event callback, allowing Node.js to manage over 1 million concurrent connections efficiently."
+  },
+
+  // ── Use Cases ─────────────────────────────────────────────────────────────
+  {
+    topic: "Node.js Use Cases",
+    q: "Which type of application is Node.js LEAST suitable for?",
+    opts: [
+      "Real-time chat applications",
+      "Data streaming applications",
+      "CPU-intensive heavy computational tasks like video encoding",
+      "JSON API-based single-page applications",
+      "I/O-bound data-intensive applications"
+    ],
+    answer: 2,
+    explain: "Node.js is <strong>not ideal for CPU-intensive tasks</strong> (e.g., video encoding, complex math, machine learning inference) because heavy computation blocks the single thread, preventing it from handling other events. It excels at I/O-bound and real-time scenarios."
+  },
+
+  // ── npm ────────────────────────────────────────────────────────────────────
+  {
+    topic: "npm & package.json",
+    q: "What is npm in the context of Node.js?",
+    opts: [
+      "Node's primary multi-threading module",
+      "A built-in Node.js module for handling HTTP requests",
+      "A package manager that provides access to reusable Node.js modules from an online repository",
+      "A tool for compiling JavaScript into machine code",
+      "A testing framework built into Node.js"
+    ],
+    answer: 2,
+    explain: "<strong>npm (Node Package Manager)</strong> is Node.js's built-in package manager. It provides access to hundreds of thousands of reusable packages from its online registry, and manages dependencies, versions, and scripts for a project."
+  },
+
+  {
+    topic: "npm & package.json",
+    q: "What is the purpose of <code>package.json</code> in a Node.js project?",
+    opts: [
+      "It is the main JavaScript file that runs the application",
+      "It defines HTML templates used by the application",
+      "It contains all information about the Node.js application including name, version, scripts, and dependencies",
+      "It stores all user session data for the application",
+      "It is a compiled binary that npm generates after installing packages"
+    ],
+    answer: 2,
+    explain: "<strong>package.json</strong> is the manifest of a Node.js project. It records the app's name, version, entry point, scripts (like start/test), and both runtime <em>dependencies</em> and <em>devDependencies</em>. It must be in the project's root directory."
+  },
+
+  {
+    topic: "npm & package.json",
+    q: "What is the difference between <code>dependencies</code> and <code>devDependencies</code> in package.json?",
+    opts: [
+      "dependencies are installed globally; devDependencies are installed locally",
+      "dependencies are needed at runtime (e.g., express); devDependencies are only needed during development (e.g., jest, nodemon)",
+      "devDependencies are loaded first; dependencies are loaded after the app starts",
+      "dependencies are free packages; devDependencies are paid packages",
+      "There is no practical difference — they work the same way"
+    ],
+    answer: 1,
+    explain: "<strong>dependencies</strong> are packages required for the application to run in production (e.g., express, mongoose). <strong>devDependencies</strong> are only needed during development or testing (e.g., jest for testing, nodemon for auto-restarting) and are excluded from production builds."
+  },
+
+  {
+    topic: "npm & package.json",
+    q: "Where does npm install packages by default?",
+    opts: [
+      "In the /usr/local/lib directory on all systems",
+      "In the browser's localStorage",
+      "In the node_modules directory of the current project",
+      "In the same directory as the package.json file's parent",
+      "In a hidden .npm folder in the user's home directory"
+    ],
+    answer: 2,
+    explain: "By default, <code class='code'>npm install</code> places all downloaded packages into the <strong>node_modules</strong> directory inside the project root. Global installs (using <code class='code'>-g</code>) are placed in a system-wide directory."
+  },
+
+  // ── Core Modules ──────────────────────────────────────────────────────────
+  {
+    topic: "Core Modules",
+    q: "What are the three types of modules in Node.js?",
+    opts: [
+      "Public, Private, and Protected modules",
+      "Core/Built-in modules, Local modules, and Third-party modules",
+      "Synchronous, Asynchronous, and Callback modules",
+      "Frontend, Backend, and Middleware modules",
+      "ES modules, CommonJS modules, and AMD modules"
+    ],
+    answer: 1,
+    explain: "Node.js has three module types: <strong>Core/Built-in</strong> (e.g., fs, http, path — come with Node.js), <strong>Local</strong> (files you create yourself), and <strong>Third-party</strong> (installed via npm, e.g., express, chalk)."
+  },
+
+  {
+    topic: "Core Modules",
+    q: "Which of the following is a built-in Core module in Node.js?",
+    opts: [
+      "express",
+      "mongoose",
+      "nodemon",
+      "fs",
+      "chalk"
+    ],
+    answer: 3,
+    explain: "<strong>fs</strong> (File System) is a core built-in module that ships with Node.js. <em>express</em>, <em>mongoose</em>, and <em>chalk</em> are third-party packages installed via npm. <em>nodemon</em> is a development tool installed via npm."
+  },
+
+  // ── Advantages & Disadvantages ────────────────────────────────────────────
+  {
+    topic: "Node.js Advantages",
+    q: "Which of the following is a key advantage of Node.js mentioned in the lecture?",
+    opts: [
+      "It uses multiple programming languages simultaneously for efficiency",
+      "It uses a single programming language (JavaScript) from frontend to backend",
+      "It is only suitable for small-scale single-user applications",
+      "It automatically generates SQL queries for any database",
+      "It requires no installation and runs directly in the browser"
+    ],
+    answer: 1,
+    explain: "One of Node.js's biggest advantages is using <strong>JavaScript on both the client and server</strong>, enabling a unified development team and shared code. It also scales easily, compiles JS to machine code via the V8 engine, and caches modules for improved performance."
+  },
+
+  {
+    topic: "Node.js Disadvantages",
+    q: "Which is a listed disadvantage of Node.js?",
+    opts: [
+      "It cannot run on Linux or macOS",
+      "It does not support any package management system",
+      "The asynchronous programming model is more complex than synchronous models",
+      "It requires Java to be installed on the server",
+      "It can only handle one HTTP request at a time"
+    ],
+    answer: 2,
+    explain: "The lecture identifies that the <strong>asynchronous programming model</strong> is more complex and harder to reason about than synchronous code. Additionally, although many npm packages exist, the number of <em>robust, well-maintained</em> libraries is comparatively lower than more mature ecosystems."
+  }
+
+];
+
+// ─── Engine ───────────────────────────────────────────────────────────────────
+let questions = [], answered = {}, mode = 'practice';
+const TOTAL = ALL_QUESTIONS.length;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-practice').classList.toggle('active', m === 'practice');
+  document.getElementById('mode-exam').classList.toggle('active', m === 'exam');
+  document.getElementById('submit-btn').style.display = m === 'exam' ? 'inline-flex' : 'none';
+  document.getElementById('results-btn').style.display = m === 'practice' ? 'inline-flex' : 'none';
+  shuffleAndReset();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleAndReset() {
+  questions = shuffle(ALL_QUESTIONS);
+  answered = {};
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+  render();
+}
+
+function render() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const keys = ['A','B','C','D','E'];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-${qi}`;
+    card.style.animationDelay = `${qi * 0.04}s`;
+
+    const state = answered[qi];
+    const isAnswered = state !== undefined;
+
+    card.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">Q${(qi+1).toString().padStart(2,'0')}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.opts.map((opt, oi) => {
+          let cls = '';
+          if (isAnswered) {
+            if (oi === q.answer) cls = mode === 'practice' ? 'correct' : (state === oi ? (oi === q.answer ? 'correct' : 'wrong') : 'reveal-correct');
+            else if (oi === state && state !== q.answer) cls = 'wrong';
+          }
+          return `<button class="option ${cls}" onclick="answer(${qi},${oi})" ${isAnswered ? 'disabled' : ''}>
+            <span class="opt-key">${keys[oi]}</span>
+            <span>${opt}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="explanation ${isAnswered && mode === 'practice' ? 'show' : ''}" id="exp-${qi}">${q.explain}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#opts-${qi} .option`);
+  opts.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.answer) btn.classList.add('correct');
+    else if (idx === oi && oi !== q.answer) btn.classList.add('wrong');
+  });
+  if (mode === 'practice') {
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  document.getElementById('stat-answered').textContent = ans;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-remaining').textContent = TOTAL - ans;
+  document.getElementById('progress-label').textContent = `${ans} / ${TOTAL} completed`;
+  document.getElementById('progress-bar').style.width = `${(ans / TOTAL) * 100}%`;
+  document.getElementById('final-total').textContent = `/ ${TOTAL}`;
+}
+
+function submitExam() {
+  questions.forEach((q, qi) => {
+    if (answered[qi] === undefined) return;
+    const opts = document.querySelectorAll(`#opts-${qi} .option`);
+    opts.forEach((btn, idx) => {
+      if (idx === q.answer) btn.classList.add('reveal-correct');
+    });
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  });
+  questions.forEach((_, qi) => {
+    document.querySelectorAll(`#opts-${qi} .option`).forEach(b => b.disabled = true);
+  });
+  showResults();
+}
+
+function showResults() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  const skipped = TOTAL - ans;
+  const pct = Math.round((correct / TOTAL) * 100);
+
+  document.getElementById('final-score').textContent = correct;
+  document.getElementById('result-title').textContent =
+    pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good Job!' : pct >= 40 ? '📚 Keep Studying' : '💪 Try Again!';
+  document.getElementById('result-msg').textContent =
+    `You scored ${correct} out of ${TOTAL} (${pct}%). ${skipped > 0 ? `${skipped} question(s) were skipped.` : 'All questions attempted!'}`;
+  document.getElementById('bd-correct').textContent = `✅ ${correct} Correct`;
+  document.getElementById('bd-wrong').textContent   = `❌ ${wrong} Wrong`;
+  document.getElementById('bd-skip').textContent    = `⬜ ${skipped} Skipped`;
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollIntoView({ behavior: 'smooth' });
+}
+
+shuffleAndReset();
+</script>
+</body>
+</html>

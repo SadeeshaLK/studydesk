@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SE2020 – Lecture 2 MCQ | Advanced HTML & CSS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --card: #161d2e; --border: #1f2d45;
+    --accent: #3b82f6; --accent2: #06b6d4; --gold: #f59e0b;
+    --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  .header { text-align:center; padding:3rem 0 2rem; }
+  .course-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent2); border:1px solid var(--accent2); padding:0.3rem 0.8rem; border-radius:2px; margin-bottom:1.2rem; text-transform:uppercase; }
+  h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.1; background:linear-gradient(135deg,#e2e8f0 0%,#3b82f6 60%,#06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.6rem; }
+  .subtitle { color:var(--muted); font-size:0.95rem; font-weight:300; }
+  .stats-bar { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:2rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.4rem; text-align:center; min-width:100px; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent); display:block; }
+  .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .progress-wrap { background:var(--border); border-radius:99px; height:6px; margin:1.5rem 0 2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.5s ease; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right; margin-bottom:0.4rem; }
+  .question-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; margin-bottom:1.5rem; transition:border-color 0.2s; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-card:hover { border-color:rgba(59,130,246,0.3); }
+  .q-meta { display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent2); background:rgba(6,182,212,0.1); padding:0.2rem 0.6rem; border-radius:4px; }
+  .q-topic { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .q-text { font-size:1.05rem; font-weight:500; line-height:1.6; color:var(--text); margin-bottom:1.4rem; }
+  .options { display:flex; flex-direction:column; gap:0.6rem; }
+  .option { display:flex; align-items:flex-start; gap:0.8rem; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s ease; background:transparent; text-align:left; width:100%; color:var(--dim); font-size:0.95rem; font-family:'DM Sans',sans-serif; line-height:1.5; }
+  .option:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:rgba(59,130,246,0.06); }
+  .option .opt-key { font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:4px; margin-top:1px; flex-shrink:0; opacity:0.7; }
+  .option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); color:var(--green); }
+  .option.wrong { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+  .option.reveal-correct { border-color:var(--green); background:rgba(16,185,129,0.05); color:var(--green); }
+  .option:disabled { cursor:default; }
+  .explanation { margin-top:1rem; padding:0.9rem 1rem; background:rgba(59,130,246,0.07); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:0.88rem; color:var(--dim); line-height:1.6; display:none; }
+  .explanation.show { display:block; animation:fadeUp 0.2s ease; }
+  .explanation strong { color:var(--accent2); }
+  .controls { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:2.5rem; }
+  .btn { font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; padding:0.8rem 2rem; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.03em; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--dim); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  #result-screen { display:none; text-align:center; padding:4rem 2rem; background:var(--card); border:1px solid var(--border); border-radius:16px; animation:fadeUp 0.4s ease; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:4px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 1.5rem; background:rgba(59,130,246,0.08); box-shadow:0 0 40px rgba(59,130,246,0.2); }
+  .score-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--accent); }
+  .score-total { font-size:0.8rem; color:var(--muted); }
+  .result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .result-msg { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .result-breakdown { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+  .breakdown-item { padding:0.7rem 1.2rem; border-radius:8px; font-size:0.85rem; font-weight:500; }
+  .bd-correct { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+  .bd-wrong   { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+  .bd-skip    { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid rgba(100,116,139,0.3); }
+  .mode-bar { display:flex; gap:0.5rem; justify-content:center; margin-bottom:2rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.4rem; }
+  .mode-btn { flex:1; padding:0.5rem; border:none; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .mode-btn.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  @media(max-width:600px) { .question-card{padding:1.2rem} h1{font-size:1.6rem} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="course-badge">SE2020 · Web Technologies & Mobile · SLIIT</div>
+    <h1>Lecture 2 — MCQ Prep</h1>
+    <p class="subtitle">Advanced HTML & CSS · CSS Selectors, Box Model, Forms, Images, Links &nbsp;·&nbsp; 30 Questions &nbsp;·&nbsp; 5 Options Each</p>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('practice')" id="mode-practice">🎯 Practice (instant feedback)</button>
+    <button class="mode-btn" onclick="setMode('exam')" id="mode-exam">📝 Exam (submit at end)</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-answered">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label">Wrong</span></div>
+    <div class="stat"><span class="stat-num" id="stat-remaining">30</span><span class="stat-label">Remaining</span></div>
+  </div>
+
+  <div class="progress-label" id="progress-label">0 / 30 completed</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="quiz-container"></div>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="shuffleAndReset()">🔀 Shuffle & Restart</button>
+    <button class="btn btn-primary" onclick="submitExam()" id="submit-btn" style="display:none">Submit Exam</button>
+    <button class="btn btn-primary" onclick="showResults()" id="results-btn">📊 View Score</button>
+  </div>
+
+  <div id="result-screen">
+    <div class="score-circle">
+      <span class="score-num" id="final-score">0</span>
+      <span class="score-total" id="final-total">/ 30</span>
+    </div>
+    <div class="result-title" id="result-title">—</div>
+    <div class="result-msg" id="result-msg">—</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item bd-correct" id="bd-correct">✅ 0 Correct</div>
+      <div class="breakdown-item bd-wrong"   id="bd-wrong">❌ 0 Wrong</div>
+      <div class="breakdown-item bd-skip"    id="bd-skip">⬜ 0 Skipped</div>
+    </div>
+    <button class="btn btn-primary" onclick="shuffleAndReset()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+  // --- CSS Basics ---
+  {
+    topic: "CSS Basics",
+    q: "What does CSS stand for?",
+    opts: [
+      "Computer Style Sheets",
+      "Cascading Style Sheets",
+      "Creative Styling System",
+      "Coded Style Syntax",
+      "Content Styling Scripts"
+    ],
+    answer: 1,
+    explain: "<strong>CSS</strong> stands for <strong>Cascading Style Sheets</strong>. It works with HTML to define how content is presented — controlling colors, fonts, layouts, and spacing."
+  },
+  {
+    topic: "CSS Basics",
+    q: "Which of the following is NOT a valid way to apply CSS to an HTML document?",
+    opts: [
+      "Inline styles directly on HTML elements",
+      "Embedded style sheet in the &lt;head&gt; section",
+      "External style sheet linked via &lt;link&gt;",
+      "Adding CSS inside the &lt;footer&gt; tag using a 'style' attribute on the footer",
+      "Importing a .css file using a &lt;link&gt; element"
+    ],
+    answer: 3,
+    explain: "CSS can be applied three ways: <strong>inline</strong> (on individual elements), <strong>embedded</strong> (in &lt;head&gt; using &lt;style&gt;), or <strong>external</strong> (a separate .css file). There is no special 'footer' method."
+  },
+  {
+    topic: "CSS Basics",
+    q: "What is the correct structure of a CSS rule set?",
+    opts: [
+      "property { selector: value; }",
+      "selector { property: value; }",
+      "value: selector { property }",
+      "selector [ property = value ]",
+      "property: value ( selector )"
+    ],
+    answer: 1,
+    explain: "A CSS rule set has a <strong>selector</strong> (which element to style) and a <strong>declaration block</strong> in curly braces containing <strong>property: value;</strong> pairs separated by semicolons."
+  },
+  {
+    topic: "CSS Basics",
+    q: "Which CSS method is most reusable across multiple HTML pages?",
+    opts: [
+      "Inline styles",
+      "Embedded style sheet",
+      "External style sheet",
+      "JavaScript-based styling",
+      "HTML attribute-based styling"
+    ],
+    answer: 2,
+    explain: "An <strong>external style sheet</strong> (.css file) can be referenced by any number of HTML files. When you update it, all linked pages update automatically — making it the most reusable approach."
+  },
+  {
+    topic: "CSS Basics",
+    q: "Why are inline styles generally avoided in final website versions?",
+    opts: [
+      "They cannot change text colors",
+      "They slow down page rendering significantly",
+      "They mix content and presentation, making maintenance difficult",
+      "They are not supported in HTML5",
+      "They require JavaScript to work"
+    ],
+    answer: 2,
+    explain: "Inline styles mix presentation with content, making code hard to maintain and update. They are useful for <strong>quick testing</strong> but external or embedded CSS is preferred for final versions."
+  },
+
+  // --- CSS Selectors ---
+  {
+    topic: "CSS Selectors",
+    q: "Which CSS selector targets ALL elements on the page?",
+    opts: [
+      ".all { }",
+      "#all { }",
+      "* { }",
+      "body > * { }",
+      "every { }"
+    ],
+    answer: 2,
+    explain: "The <strong>universal selector</strong> <code>*</code> targets every element on the page. It is commonly used to reset default browser styles."
+  },
+  {
+    topic: "CSS Selectors",
+    q: "What is a descendant (contextual) selector in CSS?",
+    opts: [
+      "A selector that targets elements by their class name",
+      "A selector separated by a comma to group multiple elements",
+      "A selector separated by whitespace that targets a tag nested inside another tag",
+      "A selector using # to target elements by ID",
+      "A selector using > to target direct child elements only"
+    ],
+    answer: 2,
+    explain: "A <strong>descendant selector</strong> uses whitespace between selectors (e.g., <code>div p</code>) to select a tag nested inside another tag. It applies styles only to elements that are descendants of the specified parent."
+  },
+  {
+    topic: "CSS Selectors",
+    q: "How do you correctly define and apply a CSS class called 'highlight'?",
+    opts: [
+      "Define: #highlight { color: red; } — Apply: &lt;p id='highlight'&gt;",
+      "Define: .highlight { color: red; } — Apply: &lt;p class='highlight'&gt;",
+      "Define: highlight { color: red; } — Apply: &lt;p name='highlight'&gt;",
+      "Define: *highlight { color: red; } — Apply: &lt;p style='highlight'&gt;",
+      "Define: @highlight { color: red; } — Apply: &lt;p ref='highlight'&gt;"
+    ],
+    answer: 1,
+    explain: "A CSS <strong>class</strong> is defined with a dot prefix (<code>.highlight</code>) and applied to elements using the <code>class</code> attribute. Classes can be reused on multiple elements."
+  },
+  {
+    topic: "CSS Selectors",
+    q: "What is the key difference between a CSS class selector and an ID selector?",
+    opts: [
+      "Class selectors use # while ID selectors use .",
+      "Class selectors can only style text; ID selectors can style any element",
+      "Class selectors can be reused on many elements; ID selectors should target only one unique element",
+      "ID selectors override all inline styles; class selectors do not",
+      "There is no practical difference between them"
+    ],
+    answer: 2,
+    explain: "A <strong>class selector</strong> (<code>.name</code>) can be applied to multiple elements for shared styling. An <strong>ID selector</strong> (<code>#name</code>) is meant for one unique element per page."
+  },
+  {
+    topic: "CSS Selectors",
+    q: "Which CSS selector correctly groups h1 and h2 to share the same style?",
+    opts: [
+      "h1 h2 { color: blue; }",
+      "h1 + h2 { color: blue; }",
+      "h1, h2 { color: blue; }",
+      "h1 > h2 { color: blue; }",
+      "h1 & h2 { color: blue; }"
+    ],
+    answer: 2,
+    explain: "<strong>Group selectors</strong> are separated by a <strong>comma</strong>. <code>h1, h2 { }</code> applies the same style rule to both h1 and h2 elements."
+  },
+
+  // --- Colors ---
+  {
+    topic: "CSS Colors",
+    q: "What color does the hexadecimal value #ff0000 represent?",
+    opts: [
+      "Green",
+      "Blue",
+      "White",
+      "Red",
+      "Yellow"
+    ],
+    answer: 3,
+    explain: "In hex color notation, <strong>#ff0000</strong> sets red to 100% (ff), green to 0% (00), and blue to 0% (00) — producing pure <strong>red</strong>."
+  },
+  {
+    topic: "CSS Colors",
+    q: "Which of the following is the functional RGB equivalent of #ffffff?",
+    opts: [
+      "rgb(0, 0, 0)",
+      "rgb(128, 128, 128)",
+      "rgb(255, 0, 255)",
+      "rgb(255, 255, 255)",
+      "rgb(100, 100, 100)"
+    ],
+    answer: 3,
+    explain: "<strong>#ffffff</strong> means red=ff (255), green=ff (255), blue=ff (255). The functional equivalent is <strong>rgb(255, 255, 255)</strong> — which is white. rgb(0,0,0) is black."
+  },
+  {
+    topic: "CSS Colors",
+    q: "What does the three-digit hex color #fb0 expand to in six-digit form?",
+    opts: [
+      "#ff00bb",
+      "#fb0000",
+      "#ffbb00",
+      "#f0b000",
+      "#00ffbb"
+    ],
+    answer: 2,
+    explain: "The three-digit form is expanded by <strong>replicating each digit</strong>, not by adding zeros. So <strong>#fb0</strong> becomes <strong>#ffbb00</strong> (f→ff, b→bb, 0→00)."
+  },
+
+  // --- Box Model ---
+  {
+    topic: "CSS Box Model",
+    q: "In the CSS Box Model, which of the following is the correct order from innermost to outermost?",
+    opts: [
+      "Content → Border → Padding → Margin",
+      "Content → Margin → Padding → Border",
+      "Padding → Content → Border → Margin",
+      "Content → Padding → Border → Margin",
+      "Border → Padding → Content → Margin"
+    ],
+    answer: 3,
+    explain: "The CSS Box Model layers from inside out are: <strong>Content → Padding → Border → Margin</strong>. Padding is the space inside the border; margin is the space outside."
+  },
+  {
+    topic: "CSS Box Model",
+    q: "A div has width: 40%, left padding: 2%, right padding: 2%. What is its total displayed width?",
+    opts: [
+      "40%",
+      "42%",
+      "44%",
+      "38%",
+      "46%"
+    ],
+    answer: 2,
+    explain: "Without box-sizing, the displayed width = <strong>width + left padding + right padding</strong> = 40% + 2% + 2% = <strong>44%</strong>. This is why float drop occurs when columns exceed 100% total."
+  },
+  {
+    topic: "CSS Box Model",
+    q: "What does the CSS property box-sizing: border-box do?",
+    opts: [
+      "Adds a visible border around all boxes on the page",
+      "Makes the element's width include its padding and border, not just the content",
+      "Removes all padding from an element",
+      "Fixes the element position to the browser border",
+      "Converts all margin values to border values"
+    ],
+    answer: 1,
+    explain: "<strong>box-sizing: border-box</strong> makes the element's total width include padding and borders within the specified width. This prevents layout overflow issues caused by added padding."
+  },
+
+  // --- Images ---
+  {
+    topic: "Images",
+    q: "Which HTML tag is used to display an image on a web page?",
+    opts: [
+      "&lt;image src='...'&gt;",
+      "&lt;photo src='...'&gt;",
+      "&lt;img src='...'&gt;",
+      "&lt;pic href='...'&gt;",
+      "&lt;media src='...'&gt;"
+    ],
+    answer: 2,
+    explain: "The <strong>&lt;img&gt;</strong> tag is the correct HTML element for displaying images. It is a self-closing (void) element. The <code>src</code> attribute specifies the image file path."
+  },
+  {
+    topic: "Images",
+    q: "Which two attributes are REQUIRED for the &lt;img&gt; tag?",
+    opts: [
+      "width and height",
+      "src and href",
+      "src and alt",
+      "alt and title",
+      "href and alt"
+    ],
+    answer: 2,
+    explain: "The <strong>src</strong> attribute specifies the image source path, and <strong>alt</strong> provides alternative text for accessibility and when the image cannot be displayed. Both are required."
+  },
+  {
+    topic: "Images",
+    q: "What is an image map in HTML?",
+    opts: [
+      "A CSS technique for scaling images responsively",
+      "An image with clickable areas that link to different destinations",
+      "A map graphic embedded using the &lt;map&gt; CSS property",
+      "A grid of thumbnail images arranged using a table",
+      "A JavaScript function that loads images dynamically"
+    ],
+    answer: 1,
+    explain: "An <strong>image map</strong> is an image with clickable areas defined using &lt;map&gt; and &lt;area&gt; tags. Each &lt;area&gt; element defines a clickable region and its link destination."
+  },
+  {
+    topic: "Images",
+    q: "Which HTML tag is used to define each clickable area within an image map?",
+    opts: [
+      "&lt;click&gt;",
+      "&lt;zone&gt;",
+      "&lt;region&gt;",
+      "&lt;area&gt;",
+      "&lt;hotspot&gt;"
+    ],
+    answer: 3,
+    explain: "The <strong>&lt;area&gt;</strong> tag defines each clickable region inside an image map. It is placed inside &lt;map&gt;&lt;/map&gt; tags and the &lt;img&gt; references the map by name."
+  },
+
+  // --- Links ---
+  {
+    topic: "Links & URLs",
+    q: "Which HTML tag and attribute combination creates a hyperlink to an external URL?",
+    opts: [
+      "&lt;link href='https://example.com'&gt;",
+      "&lt;a src='https://example.com'&gt;",
+      "&lt;a href='https://example.com'&gt;",
+      "&lt;url href='https://example.com'&gt;",
+      "&lt;nav link='https://example.com'&gt;"
+    ],
+    answer: 2,
+    explain: "The <strong>&lt;a&gt;</strong> (anchor) tag with the <strong>href</strong> attribute creates a hyperlink. The href value specifies the destination URL. &lt;link&gt; is used to link stylesheets in &lt;head&gt;."
+  },
+  {
+    topic: "Links & URLs",
+    q: "What attribute is used to create a named anchor point within a document for internal navigation?",
+    opts: [
+      "name='anchor'",
+      "href='#point'",
+      "id='sectionName'",
+      "link='internal'",
+      "ref='section'"
+    ],
+    answer: 2,
+    explain: "A named anchor point is specified using the <strong>id</strong> attribute on an element (e.g., &lt;h2 id='section1'&gt;). To link to it, use href='#section1' in an anchor tag."
+  },
+  {
+    topic: "Links & URLs",
+    q: "What does the following meta tag do: &lt;meta http-equiv='refresh' content='5; url=newpage.html'&gt;?",
+    opts: [
+      "Refreshes the page style every 5 seconds",
+      "Loads newpage.html after a delay of 5 seconds automatically",
+      "Sets the page cache to expire in 5 minutes",
+      "Links to newpage.html only if the page has not loaded in 5 seconds",
+      "Redirects immediately without any delay"
+    ],
+    answer: 1,
+    explain: "This is an <strong>automatic redirect</strong> tag. After <strong>5 seconds</strong>, the browser automatically navigates to <strong>newpage.html</strong>. This is controlled by the http-equiv='refresh' attribute."
+  },
+  {
+    topic: "Links & URLs",
+    q: "Which HTML attribute creates an email link that opens the user's email client?",
+    opts: [
+      "&lt;a href='email:user@example.com'&gt;",
+      "&lt;a href='send:user@example.com'&gt;",
+      "&lt;a href='mailto:user@example.com'&gt;",
+      "&lt;a email='user@example.com'&gt;",
+      "&lt;mail to='user@example.com'&gt;"
+    ],
+    answer: 2,
+    explain: "Using <strong>href='mailto:address'</strong> in an anchor tag creates an email link. When clicked, it opens the user's default email client with the recipient address pre-filled."
+  },
+
+  // --- IFrames & Special Chars ---
+  {
+    topic: "IFrames & Special Characters",
+    q: "What is the purpose of an &lt;iframe&gt; element?",
+    opts: [
+      "To embed a JavaScript file directly in the page",
+      "To display a Web page within another Web page",
+      "To create an inline form without the &lt;form&gt; tag",
+      "To add an inline image with a frame border",
+      "To link to an external stylesheet file"
+    ],
+    answer: 1,
+    explain: "An <strong>&lt;iframe&gt;</strong> (inline frame) is used to <strong>display a Web page within another Web page</strong>. It embeds external content directly inside the current document."
+  },
+  {
+    topic: "IFrames & Special Characters",
+    q: "Why can't you use the < character directly in HTML content?",
+    opts: [
+      "Because < is a reserved keyword in JavaScript",
+      "Because < starts a markup tag and would confuse the HTML parser",
+      "Because < is not available on all keyboards",
+      "Because < is only valid inside &lt;script&gt; tags",
+      "Because < renders as a blank space in all browsers"
+    ],
+    answer: 1,
+    explain: "The <strong>&lt;</strong> character starts an HTML tag. Using it directly in content would confuse the browser's HTML parser. Instead, use the escape sequence <strong>&amp;lt;</strong> to represent it."
+  },
+
+  // --- CSS Float & Positioning ---
+  {
+    topic: "CSS Float & Layout",
+    q: "What does the CSS clear property do?",
+    opts: [
+      "Removes all CSS styles from an element",
+      "Clears the browser cache for that page element",
+      "Forces an element not to wrap around a floated element, dropping below it instead",
+      "Makes an element invisible without removing it from layout",
+      "Resets the element's position to static"
+    ],
+    answer: 2,
+    explain: "The <strong>CSS clear property</strong> instructs an element not to wrap around floated elements. Using <code>clear: both</code> forces it to drop below any element floated either left or right."
+  },
+  {
+    topic: "CSS Float & Layout",
+    q: "What is 'float drop' in CSS layouts?",
+    opts: [
+      "A column that disappears when the browser is resized",
+      "When an animation drops an element off the page",
+      "When a floated column wraps below others because there isn't enough horizontal space",
+      "When the float property is accidentally removed from an element",
+      "When margin collapse causes two elements to overlap"
+    ],
+    answer: 2,
+    explain: "<strong>Float drop</strong> occurs when the total displayed width of floated columns exceeds 100%, causing one column to drop down to the next line. The fix is reducing column widths or using box-sizing: border-box."
+  },
+  {
+    topic: "CSS Float & Layout",
+    q: "Which CSS technique clears floats by adding a pseudo-element after the container?",
+    opts: [
+      ".container { overflow: hidden; }",
+      ".container { clear: both; }",
+      ".container::after { content: ''; display: block; clear: both; }",
+      ".container { float: none; }",
+      ".container { position: relative; }"
+    ],
+    answer: 2,
+    explain: "The <strong>clearfix hack</strong> uses <code>::after</code> pseudo-element with <code>content: ''</code>, <code>display: block</code>, and <code>clear: both</code> to contain floated children without extra HTML."
+  },
+
+  // --- HTML Forms ---
+  {
+    topic: "HTML Forms",
+    q: "Which HTML tag is used to create a form?",
+    opts: [
+      "&lt;input&gt;",
+      "&lt;form&gt;",
+      "&lt;fieldset&gt;",
+      "&lt;submit&gt;",
+      "&lt;panel&gt;"
+    ],
+    answer: 1,
+    explain: "The <strong>&lt;form&gt;</strong> tag creates an HTML form. It wraps all form controls and has attributes like <code>action</code> (where to send data) and <code>method</code> (GET or POST)."
+  },
+  {
+    topic: "HTML Forms",
+    q: "What is the default method for an HTML form?",
+    opts: [
+      "POST",
+      "PUT",
+      "GET",
+      "SEND",
+      "SUBMIT"
+    ],
+    answer: 2,
+    explain: "The default method for an HTML form is <strong>GET</strong>. With GET, form data is appended to the URL. POST sends data in the request body and is preferred for sensitive data."
+  },
+  {
+    topic: "HTML Forms",
+    q: "What is the difference between an explicit and implicit label in HTML forms?",
+    opts: [
+      "Explicit labels use &lt;span&gt;; implicit labels use &lt;div&gt;",
+      "Explicit labels are linked via the 'for' attribute matching an input's 'id'; implicit labels wrap around the control",
+      "Explicit labels are visible; implicit labels are hidden",
+      "Implicit labels use the 'for' attribute; explicit labels are wrapped around controls",
+      "There is no functional difference between them"
+    ],
+    answer: 1,
+    explain: "<strong>Explicit labels</strong> use the <code>for</code> attribute (matching the input's <code>id</code>) and are separate from the control. <strong>Implicit labels</strong> wrap around the control. Explicit labels are better supported by screen readers."
+  },
+  {
+    topic: "HTML Forms",
+    q: "Which input type allows the user to select multiple items from a scrolling list?",
+    opts: [
+      "&lt;input type='checkbox'&gt;",
+      "&lt;select multiple&gt;",
+      "&lt;datalist&gt;",
+      "&lt;input type='radio'&gt;",
+      "&lt;input type='range'&gt;"
+    ],
+    answer: 1,
+    explain: "Adding the <strong>multiple</strong> attribute to the <strong>&lt;select&gt;</strong> tag creates a scrolling list where users can select one or more items. Without it, &lt;select&gt; shows a standard dropdown."
+  },
+  {
+    topic: "HTML Forms",
+    q: "What is the advantage of the placeholder attribute over setting a default value in an input?",
+    opts: [
+      "Placeholder values are submitted with the form; default values are not",
+      "Placeholder text auto-disappears when typing starts and reappears if cleared, so the hint is never permanently lost",
+      "Placeholder values are validated automatically; default values are not",
+      "Placeholder text appears in bold; default values do not",
+      "There is no practical difference between them"
+    ],
+    answer: 1,
+    explain: "A <strong>placeholder</strong> disappears when the user starts typing and reappears if they clear the field — so the hint is always available. A default value stays until manually deleted, potentially confusing users."
+  },
+  {
+    topic: "HTML Forms",
+    q: "Which HTML5 input type automatically validates that the entered text is a valid email format?",
+    opts: [
+      "type='text'",
+      "type='search'",
+      "type='email'",
+      "type='tel'",
+      "type='url'"
+    ],
+    answer: 2,
+    explain: "<strong>type='email'</strong> is an HTML5 input type that automatically checks the validity of the email format entered. If the browser doesn't support it, it falls back to type='text'."
+  },
+  {
+    topic: "HTML Forms",
+    q: "What does the &lt;fieldset&gt; and &lt;legend&gt; combination do in a form?",
+    opts: [
+      "Creates a dropdown menu with grouped options",
+      "Groups several form controls and labels together with a visible border and caption",
+      "Applies CSS styling to all inputs within a section",
+      "Makes form fields required and displays an error legend",
+      "Creates a hidden form group for backend processing"
+    ],
+    answer: 1,
+    explain: "<strong>&lt;fieldset&gt;</strong> groups related form controls together with a box border. <strong>&lt;legend&gt;</strong> provides a caption for the group. Together they improve form organization and accessibility."
+  },
+  {
+    topic: "HTML Forms",
+    q: "When submitting a form with method='post' and action='mailto:user@example.com', what happens?",
+    opts: [
+      "The form data is saved to a local database",
+      "The browser navigates to user@example.com as a URL",
+      "The form content is posted to the specified email address via the user's configured mail client",
+      "The form resets to its default values",
+      "A JavaScript fetch request is sent to the email server"
+    ],
+    answer: 2,
+    explain: "Using <code>method='post' action='mailto:...' enctype='text/plain'</code> sends the form content to the specified email via the user's <strong>mail client</strong>. This requires mail preferences to be configured in the browser."
+  },
+
+  // --- Lab / Tutorial CSS ---
+  {
+    topic: "Lab & Tutorial",
+    q: "In the Tutorial 02 navigation bar, which CSS property was used to make list items appear side-by-side horizontally?",
+    opts: [
+      "float: left",
+      "position: inline",
+      "display: inline",
+      "flex-direction: row",
+      "margin: horizontal"
+    ],
+    answer: 2,
+    explain: "Setting <strong>display: inline</strong> on &lt;li&gt; elements removes the default block layout, placing them side-by-side. Note: <code>display: inline</code> also removes bullet points, replacing the need for list-style: none."
+  },
+  {
+    topic: "Lab & Tutorial",
+    q: "In Lab 01, what HTML attributes were required on the &lt;table&gt; tag to produce a table with visible borders and 8px cell padding?",
+    opts: [
+      "style='border:1px; padding:8px'",
+      "border='1' cellpadding='8' cellspacing='0'",
+      "border-collapse='1' padding='8'",
+      "outline='1' spacing='0' pad='8'",
+      "css='border:1; cellpad:8; cellspace:0'"
+    ],
+    answer: 1,
+    explain: "The Lab 01 table used HTML attributes <strong>border='1'</strong> (visible border), <strong>cellpadding='8'</strong> (space inside cells), and <strong>cellspacing='0'</strong> (space between cells) directly on the &lt;table&gt; tag."
+  }
+
+];
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let questions = [];
+let answered  = {};
+let mode = 'practice';
+const TOTAL = ALL_QUESTIONS.length;
+
+// ─── Mode ────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-practice').classList.toggle('active', m === 'practice');
+  document.getElementById('mode-exam').classList.toggle('active', m === 'exam');
+  document.getElementById('submit-btn').style.display = m === 'exam' ? 'inline-flex' : 'none';
+  document.getElementById('results-btn').style.display = m === 'practice' ? 'inline-flex' : 'none';
+  shuffleAndReset();
+}
+
+// ─── Shuffle ──────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleAndReset() {
+  questions = shuffle(ALL_QUESTIONS);
+  answered = {};
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+  render();
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const keys = ['A','B','C','D','E'];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-${qi}`;
+    card.style.animationDelay = `${qi * 0.04}s`;
+
+    const state = answered[qi];
+    const isAnswered = state !== undefined;
+
+    card.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">Q${(qi+1).toString().padStart(2,'0')}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.opts.map((opt, oi) => {
+          let cls = '';
+          if (isAnswered) {
+            if (oi === q.answer) cls = mode === 'practice' ? 'correct' : (state === oi ? (oi === q.answer ? 'correct' : 'wrong') : 'reveal-correct');
+            else if (oi === state && state !== q.answer) cls = 'wrong';
+          }
+          return `<button class="option ${cls}" onclick="answer(${qi},${oi})" ${isAnswered ? 'disabled' : ''}>
+            <span class="opt-key">${keys[oi]}</span>
+            <span>${opt}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="explanation ${isAnswered && mode === 'practice' ? 'show' : ''}" id="exp-${qi}">${q.explain}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ─── Answer ───────────────────────────────────────────────────────────────────
+function answer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#opts-${qi} .option`);
+  opts.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.answer) btn.classList.add('correct');
+    else if (idx === oi && oi !== q.answer) btn.classList.add('wrong');
+  });
+  if (mode === 'practice') {
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  }
+  updateStats();
+}
+
+// ─── Stats ────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  document.getElementById('stat-answered').textContent = ans;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-remaining').textContent = TOTAL - ans;
+  document.getElementById('progress-label').textContent = `${ans} / ${TOTAL} completed`;
+  document.getElementById('progress-bar').style.width = `${(ans / TOTAL) * 100}%`;
+  document.getElementById('final-total').textContent = `/ ${TOTAL}`;
+}
+
+// ─── Exam submit ──────────────────────────────────────────────────────────────
+function submitExam() {
+  questions.forEach((q, qi) => {
+    if (answered[qi] === undefined) return;
+    const opts = document.querySelectorAll(`#opts-${qi} .option`);
+    opts.forEach((btn, idx) => {
+      if (idx === q.answer) btn.classList.add('reveal-correct');
+    });
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  });
+  questions.forEach((_, qi) => {
+    document.querySelectorAll(`#opts-${qi} .option`).forEach(b => b.disabled = true);
+  });
+  showResults();
+}
+
+// ─── Results ──────────────────────────────────────────────────────────────────
+function showResults() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  const skipped = TOTAL - ans;
+  const pct = Math.round((correct / TOTAL) * 100);
+
+  document.getElementById('final-score').textContent = correct;
+  document.getElementById('result-title').textContent =
+    pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good Job!' : pct >= 40 ? '📚 Keep Studying' : '💪 Try Again!';
+  document.getElementById('result-msg').textContent =
+    `You scored ${correct} out of ${TOTAL} (${pct}%). ${skipped > 0 ? `${skipped} question(s) were skipped.` : 'All questions attempted!'}`;
+  document.getElementById('bd-correct').textContent = `✅ ${correct} Correct`;
+  document.getElementById('bd-wrong').textContent   = `❌ ${wrong} Wrong`;
+  document.getElementById('bd-skip').textContent    = `⬜ ${skipped} Skipped`;
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+shuffleAndReset();
+</script>
+</body>
+</html>

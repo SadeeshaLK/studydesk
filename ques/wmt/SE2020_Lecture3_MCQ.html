@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SE2020 – Lecture 3 MCQ | Introduction to JavaScript</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --card: #161d2e; --border: #1f2d45;
+    --accent: #3b82f6; --accent2: #06b6d4; --gold: #f59e0b;
+    --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  .header { text-align:center; padding:3rem 0 2rem; }
+  .course-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent2); border:1px solid var(--accent2); padding:0.3rem 0.8rem; border-radius:2px; margin-bottom:1.2rem; text-transform:uppercase; }
+  h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.1; background:linear-gradient(135deg,#e2e8f0 0%,#3b82f6 60%,#06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.6rem; }
+  .subtitle { color:var(--muted); font-size:0.95rem; font-weight:300; }
+  .stats-bar { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:2rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.4rem; text-align:center; min-width:100px; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent); display:block; }
+  .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .progress-wrap { background:var(--border); border-radius:99px; height:6px; margin:1.5rem 0 2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.5s ease; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right; margin-bottom:0.4rem; }
+  .question-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; margin-bottom:1.5rem; transition:border-color 0.2s; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-card:hover { border-color:rgba(59,130,246,0.3); }
+  .q-meta { display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent2); background:rgba(6,182,212,0.1); padding:0.2rem 0.6rem; border-radius:4px; }
+  .q-topic { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .q-text { font-size:1.05rem; font-weight:500; line-height:1.6; color:var(--text); margin-bottom:1.4rem; }
+  .options { display:flex; flex-direction:column; gap:0.6rem; }
+  .option { display:flex; align-items:flex-start; gap:0.8rem; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s ease; background:transparent; text-align:left; width:100%; color:var(--dim); font-size:0.95rem; font-family:'DM Sans',sans-serif; line-height:1.5; }
+  .option:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:rgba(59,130,246,0.06); }
+  .option .opt-key { font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:4px; margin-top:1px; flex-shrink:0; opacity:0.7; }
+  .option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); color:var(--green); }
+  .option.wrong { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+  .option.reveal-correct { border-color:var(--green); background:rgba(16,185,129,0.05); color:var(--green); }
+  .option:disabled { cursor:default; }
+  .explanation { margin-top:1rem; padding:0.9rem 1rem; background:rgba(59,130,246,0.07); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:0.88rem; color:var(--dim); line-height:1.6; display:none; }
+  .explanation.show { display:block; animation:fadeUp 0.2s ease; }
+  .explanation strong { color:var(--accent2); }
+  .code { font-family:'DM Mono',monospace; background:rgba(0,0,0,0.3); padding:0.15rem 0.4rem; border-radius:3px; font-size:0.85em; color:#93c5fd; }
+  .controls { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:2.5rem; }
+  .btn { font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; padding:0.8rem 2rem; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.03em; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--dim); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  #result-screen { display:none; text-align:center; padding:4rem 2rem; background:var(--card); border:1px solid var(--border); border-radius:16px; animation:fadeUp 0.4s ease; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:4px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 1.5rem; background:rgba(59,130,246,0.08); box-shadow:0 0 40px rgba(59,130,246,0.2); }
+  .score-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--accent); }
+  .score-total { font-size:0.8rem; color:var(--muted); }
+  .result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .result-msg { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .result-breakdown { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+  .breakdown-item { padding:0.7rem 1.2rem; border-radius:8px; font-size:0.85rem; font-weight:500; }
+  .bd-correct { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+  .bd-wrong   { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+  .bd-skip    { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid rgba(100,116,139,0.3); }
+  .mode-bar { display:flex; gap:0.5rem; justify-content:center; margin-bottom:2rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.4rem; }
+  .mode-btn { flex:1; padding:0.5rem; border:none; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .mode-btn.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  @media(max-width:600px) { .question-card{padding:1.2rem} h1{font-size:1.6rem} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="course-badge">SE2020 · Web Technologies & Mobile · SLIIT</div>
+    <h1>Lecture 3 — MCQ Prep</h1>
+    <p class="subtitle">Introduction to JavaScript · Variables, Types, DOM, Loops, Functions, Arrays &nbsp;·&nbsp; 32 Questions &nbsp;·&nbsp; 5 Options Each</p>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('practice')" id="mode-practice">🎯 Practice (instant feedback)</button>
+    <button class="mode-btn" onclick="setMode('exam')" id="mode-exam">📝 Exam (submit at end)</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-answered">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label">Wrong</span></div>
+    <div class="stat"><span class="stat-num" id="stat-remaining">32</span><span class="stat-label">Remaining</span></div>
+  </div>
+
+  <div class="progress-label" id="progress-label">0 / 32 completed</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="quiz-container"></div>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="shuffleAndReset()">🔀 Shuffle & Restart</button>
+    <button class="btn btn-primary" onclick="submitExam()" id="submit-btn" style="display:none">Submit Exam</button>
+    <button class="btn btn-primary" onclick="showResults()" id="results-btn">📊 View Score</button>
+  </div>
+
+  <div id="result-screen">
+    <div class="score-circle">
+      <span class="score-num" id="final-score">0</span>
+      <span class="score-total" id="final-total">/ 32</span>
+    </div>
+    <div class="result-title" id="result-title">—</div>
+    <div class="result-msg" id="result-msg">—</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item bd-correct" id="bd-correct">✅ 0 Correct</div>
+      <div class="breakdown-item bd-wrong"   id="bd-wrong">❌ 0 Wrong</div>
+      <div class="breakdown-item bd-skip"    id="bd-skip">⬜ 0 Skipped</div>
+    </div>
+    <button class="btn btn-primary" onclick="shuffleAndReset()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+  // --- Role of JavaScript ---
+  {
+    topic: "Role of JavaScript",
+    q: "Which of the following best describes the role of JavaScript in web development?",
+    opts: [
+      "Defines the content and structure of a web page",
+      "Controls how the page looks — fonts, colors, and layout",
+      "Adds interactivity and dynamic behaviour to web pages",
+      "Manages the database behind the web server",
+      "Describes how data is stored and transmitted over HTTP"
+    ],
+    answer: 2,
+    explain: "In the three-layer web model: <strong>HTML</strong> is for content, <strong>CSS</strong> is for presentation, and <strong>JavaScript</strong> is for <strong>interactivity</strong> — validating forms, responding to user input, and manipulating the page."
+  },
+  {
+    topic: "Role of JavaScript",
+    q: "Which of the following is NOT a capability of JavaScript described in Lecture 03?",
+    opts: [
+      "Validate user input in an HTML form before sending data to a server",
+      "Open and close new browser windows",
+      "Build small complete client-side programs like calculators",
+      "Directly connect to and query a SQL database",
+      "Change or rewrite images in a document"
+    ],
+    answer: 3,
+    explain: "JavaScript is a <strong>client-side</strong> language — it runs in the browser. It cannot directly query a SQL database; that requires a server-side language. All other options are valid JavaScript capabilities."
+  },
+  {
+    topic: "Role of JavaScript",
+    q: "Which HTML tag is used to embed JavaScript code in an HTML document?",
+    opts: [
+      "&lt;js&gt;&lt;/js&gt;",
+      "&lt;code&gt;&lt;/code&gt;",
+      "&lt;script&gt;&lt;/script&gt;",
+      "&lt;javascript&gt;&lt;/javascript&gt;",
+      "&lt;run&gt;&lt;/run&gt;"
+    ],
+    answer: 2,
+    explain: "The <strong>&lt;script&gt;&lt;/script&gt;</strong> tag is used to embed JavaScript in HTML. It can be placed in the &lt;head&gt; or &lt;body&gt;, though placing it just before &lt;/body&gt; is common practice."
+  },
+  {
+    topic: "Role of JavaScript",
+    q: "Which JavaScript method outputs a message to the browser's developer console?",
+    opts: [
+      "document.write()",
+      "alert()",
+      "window.print()",
+      "console.log()",
+      "innerHTML()"
+    ],
+    answer: 3,
+    explain: "<strong>console.log()</strong> prints messages to the browser's developer console (accessible via F12 → Console tab). It is the most common debugging tool in JavaScript."
+  },
+
+  // --- Variables ---
+  {
+    topic: "Variables",
+    q: "Which keyword declares a block-scoped variable that CAN be reassigned?",
+    opts: [
+      "const",
+      "var",
+      "let",
+      "static",
+      "define"
+    ],
+    answer: 2,
+    explain: "<strong>let</strong> declares a block-scoped variable that can be reassigned. <strong>const</strong> cannot be reassigned. <strong>var</strong> is function-scoped (older approach). Use <strong>let</strong> for values that will change."
+  },
+  {
+    topic: "Variables",
+    q: "What is the key difference between var and let in JavaScript?",
+    opts: [
+      "var is for numbers only; let is for strings only",
+      "var is function/globally scoped; let is block-scoped",
+      "let is hoisted; var is not",
+      "var can only be declared once; let can be declared multiple times",
+      "There is no practical difference between var and let"
+    ],
+    answer: 1,
+    explain: "<strong>var</strong> is function-scoped (or globally scoped) and is hoisted. <strong>let</strong> is <strong>block-scoped</strong> — its scope is limited to the block (e.g., inside an if statement or loop) where it is declared."
+  },
+  {
+    topic: "Variables",
+    q: "Which of the following statements about const is CORRECT?",
+    opts: [
+      "const variables can be reassigned using the = operator",
+      "const variables must be declared without an initial value",
+      "const variables are function-scoped like var",
+      "const creates a read-only reference; object/array properties can still be changed",
+      "const variables are automatically converted to let after first use"
+    ],
+    answer: 3,
+    explain: "<strong>const</strong> creates a read-only binding — the variable identifier cannot be reassigned. However, if it holds an <strong>object or array</strong>, its properties or elements can still be modified. An initializer is always required with const."
+  },
+  {
+    topic: "Variables",
+    q: "According to the general rule in Lecture 03, when should you use var?",
+    opts: [
+      "Always — it is the modern recommended approach",
+      "For all variables that will change value",
+      "Only when your code needs to run on older browsers",
+      "For constants that never change",
+      "When declaring arrays and objects"
+    ],
+    answer: 2,
+    explain: "The general rule: use <strong>const</strong> for objects/arrays and values that won't change; use <strong>let</strong> for variables that will be reassigned; use <strong>var</strong> only if the code must run on <strong>older browsers</strong>."
+  },
+  {
+    topic: "Variables",
+    q: "What is 'hoisting' in JavaScript as it relates to var?",
+    opts: [
+      "Moving a variable's value to the top of the page for display",
+      "Declaring variables inside a function automatically makes them global",
+      "var declarations are processed before any code is executed",
+      "Hoisting copies a variable's value to all child functions",
+      "The browser raises an error for undeclared variables"
+    ],
+    answer: 2,
+    explain: "<strong>Hoisting</strong> means that <strong>var declarations</strong> are processed before any code executes — the variable is moved to the top of its scope. This is why var can be used before it appears to be declared, though its value is undefined until the assignment line."
+  },
+
+  // --- Identifiers ---
+  {
+    topic: "Identifiers",
+    q: "Which of the following is a VALID JavaScript identifier?",
+    opts: [
+      "2count",
+      "my-variable",
+      "let",
+      "$totalPrice",
+      "function"
+    ],
+    answer: 3,
+    explain: "<strong>$totalPrice</strong> is valid — identifiers can contain letters, numbers, dollar signs ($), and underscores (_), but cannot start with a number or use reserved words. <code>let</code> and <code>function</code> are reserved keywords."
+  },
+  {
+    topic: "Identifiers",
+    q: "Why can't reserved words be used as variable names in JavaScript?",
+    opts: [
+      "They are too long for the JavaScript engine to process",
+      "They are already used by the JavaScript language for specific syntax purposes",
+      "Reserved words are automatically converted to numbers",
+      "They can only be used inside functions, not globally",
+      "They are only available in older browsers"
+    ],
+    answer: 1,
+    explain: "<strong>Reserved words</strong> (like <code>let</code>, <code>const</code>, <code>if</code>, <code>function</code>) have special meaning in the JavaScript language. Using them as variable names would confuse the parser. Examples include: let, const, var, if, else, function, return."
+  },
+  {
+    topic: "Identifiers",
+    q: "JavaScript is case-sensitive. What will the following print?\n\nlet name = 'IT Student';\nlet Name = 'SE Student';\nconsole.log(name);",
+    opts: [
+      "SE Student",
+      "IT Student",
+      "undefined",
+      "An error — duplicate variable declaration",
+      "Both IT Student and SE Student"
+    ],
+    answer: 1,
+    explain: "JavaScript is <strong>case-sensitive</strong>. <code>name</code> and <code>Name</code> are <strong>completely different variables</strong>. <code>console.log(name)</code> prints the value of <code>name</code>, which is <strong>'IT Student'</strong>."
+  },
+
+  // --- Data Types ---
+  {
+    topic: "Data Types",
+    q: "Which of the following lists ONLY JavaScript primitive types?",
+    opts: [
+      "String, Array, Boolean, Number",
+      "String, Number, Boolean, Null, Undefined",
+      "Object, Function, Array, Date",
+      "String, Object, Null, Function",
+      "Number, Boolean, Array, Undefined"
+    ],
+    answer: 1,
+    explain: "JavaScript primitive types are: <strong>String, Number, Boolean, Null, and Undefined</strong>. Everything else (Array, Function, Date) is considered an <strong>Object</strong> type."
+  },
+  {
+    topic: "Data Types",
+    q: "What is the difference between null and undefined in JavaScript?",
+    opts: [
+      "null is a number type; undefined is a string type",
+      "null represents an intentional absence of value; undefined means no value has been assigned at all",
+      "undefined is set by the programmer; null is set by the browser automatically",
+      "They are exactly the same — both mean 'no value'",
+      "null is only used in arrays; undefined is used in objects"
+    ],
+    answer: 1,
+    explain: "<strong>null</strong> represents an intentional absence of value (programmer sets it deliberately). <strong>undefined</strong> means a variable has been declared but no value has been assigned yet — it is the default uninitialized state."
+  },
+  {
+    topic: "Data Types",
+    q: "What does console.log(5 === '5') output in JavaScript, and why?",
+    opts: [
+      "true — because both have value 5",
+      "true — JavaScript auto-converts types before comparing",
+      "false — === is strict equality and checks both value AND type",
+      "false — numbers can never equal strings",
+      "An error — you cannot compare a number to a string"
+    ],
+    answer: 2,
+    explain: "<strong>===</strong> is the <strong>strict equality</strong> operator. It checks both value AND type. <code>5</code> (Number) and <code>'5'</code> (String) have different types, so the result is <strong>false</strong>. Use <code>==</code> for loose equality (type coercion)."
+  },
+  {
+    topic: "Data Types",
+    q: "JavaScript is described as a 'loosely typed' language. What does this mean?",
+    opts: [
+      "Variables must always be declared with a type keyword",
+      "There is no distinction between integer and floating-point numbers; types are flexible",
+      "JavaScript only supports string and number types",
+      "All variables are converted to strings automatically",
+      "Loosely typed means JavaScript runs more slowly than strongly typed languages"
+    ],
+    answer: 1,
+    explain: "JavaScript is <strong>loosely typed</strong> — there is no explicit distinction between integers and floats (all numbers are the Number type). Unlike C++ or Java, you don't declare a variable's type; the engine determines it at runtime."
+  },
+
+  // --- Conditional Statements ---
+  {
+    topic: "Conditional Statements",
+    q: "Which conditional statement is best suited to check multiple fixed values of a single variable?",
+    opts: [
+      "if statement",
+      "if...else statement",
+      "while loop",
+      "switch statement",
+      "for...in loop"
+    ],
+    answer: 3,
+    explain: "The <strong>switch statement</strong> is designed to check one variable against multiple possible fixed values (cases). It is cleaner than a long chain of if...else if statements when checking the same variable repeatedly."
+  },
+  {
+    topic: "Conditional Statements",
+    q: "In a switch statement, what is the purpose of the break keyword?",
+    opts: [
+      "It exits the entire JavaScript program",
+      "It skips to the next iteration of a loop",
+      "It stops execution from falling through to the next case",
+      "It re-evaluates the switch expression",
+      "It marks the end of the switch block"
+    ],
+    answer: 2,
+    explain: "<strong>break</strong> stops execution from falling through to the next case in a switch statement. Without break, JavaScript continues executing subsequent cases even if they don't match — this is called 'fall-through'."
+  },
+  {
+    topic: "Conditional Statements",
+    q: "What is the purpose of the default case in a switch statement?",
+    opts: [
+      "It runs first, before all other cases are checked",
+      "It is required and causes an error if missing",
+      "It executes when no other case matches the switch expression",
+      "It resets the switch variable to its original value",
+      "It declares the default value for the variable being switched on"
+    ],
+    answer: 2,
+    explain: "The <strong>default</strong> case in a switch statement runs when <strong>none of the other cases match</strong> the expression. It is optional but acts like a final else — useful for handling unexpected values."
+  },
+
+  // --- Comparison & Logical Operators ---
+  {
+    topic: "Operators",
+    q: "What is the difference between == and === in JavaScript?",
+    opts: [
+      "== checks value only; === checks value AND type (strict equality)",
+      "=== checks value only; == checks value AND type",
+      "== is used in if statements; === is used in switch statements",
+      "== works only for numbers; === works for all types",
+      "There is no difference — both behave identically"
+    ],
+    answer: 0,
+    explain: "<strong>==</strong> is the loose equality operator — it performs type coercion before comparing (e.g., 5 == '5' is true). <strong>===</strong> is the strict equality operator — it checks both value AND type (e.g., 5 === '5' is false)."
+  },
+  {
+    topic: "Operators",
+    q: "What does the following JavaScript code output?\n\nlet age = 20;\nlet isPassed = true;\nif (age > 18 && isPassed) {\n  console.log('Eligible');\n}",
+    opts: [
+      "Nothing — the condition is false",
+      "Eligible",
+      "true",
+      "An error — you cannot combine a comparison with a boolean",
+      "20 true"
+    ],
+    answer: 1,
+    explain: "The <strong>&&</strong> (AND) operator returns true only if <strong>both</strong> conditions are true. Here, <code>age > 18</code> is true (20 > 18) and <code>isPassed</code> is true, so the overall condition is true → <strong>'Eligible'</strong> is printed."
+  },
+  {
+    topic: "Operators",
+    q: "Which logical operator returns true if AT LEAST ONE condition is true?",
+    opts: [
+      "&& (AND)",
+      "! (NOT)",
+      "== (EQUAL)",
+      "|| (OR)",
+      "!== (NOT EQUAL)"
+    ],
+    answer: 3,
+    explain: "The <strong>||</strong> (OR) operator returns true if <strong>at least one</strong> of the conditions is true. <code>&&</code> requires both to be true. <code>!</code> negates a boolean value."
+  },
+
+  // --- Loops ---
+  {
+    topic: "Loops",
+    q: "Which of the following describes a key difference between a while loop and a do...while loop?",
+    opts: [
+      "while loops run faster than do...while loops",
+      "do...while always executes the body at least once; while may skip it entirely",
+      "while loops can only count up; do...while can count in any direction",
+      "do...while is only used inside functions; while is used globally",
+      "There is no difference — they produce identical results"
+    ],
+    answer: 1,
+    explain: "A <strong>do...while</strong> loop executes the body <strong>at least once</strong> before checking the condition (condition is at the end). A <strong>while</strong> loop checks the condition first — if false from the start, the body never executes."
+  },
+  {
+    topic: "Loops",
+    q: "What does the break statement do inside a loop?",
+    opts: [
+      "Pauses the loop for one iteration then resumes",
+      "Skips the rest of the current iteration and moves to the next one",
+      "Immediately exits the loop entirely",
+      "Resets the loop counter to zero",
+      "Throws an error and stops the JavaScript engine"
+    ],
+    answer: 2,
+    explain: "The <strong>break</strong> statement <strong>immediately exits</strong> the loop it is in. Execution continues with the code after the loop. The <strong>continue</strong> statement (different) skips the current iteration and continues with the next one."
+  },
+  {
+    topic: "Loops",
+    q: "What does the continue statement do inside a loop?",
+    opts: [
+      "Exits the loop immediately",
+      "Skips the rest of the current iteration and moves to the next iteration",
+      "Restarts the loop from the first iteration",
+      "Pauses the loop until the user clicks a button",
+      "Converts the loop into a while loop"
+    ],
+    answer: 1,
+    explain: "The <strong>continue</strong> statement skips the remaining code in the <strong>current iteration</strong> and jumps to the next iteration of the loop. Unlike <strong>break</strong>, it does not exit the loop — it just skips forward."
+  },
+  {
+    topic: "Loops",
+    q: "What is the correct structure of a JavaScript for loop?",
+    opts: [
+      "for (condition; init; update) { }",
+      "for (init; condition; update) { }",
+      "for (update; condition; init) { }",
+      "for (condition) { init; update; }",
+      "for init while condition step update { }"
+    ],
+    answer: 1,
+    explain: "The correct for loop syntax is: <strong>for (initialization; condition; update)</strong>. Example: <code>for (let i = 0; i &lt; 5; i++)</code>. The loop runs as long as the condition is true, updating after each iteration."
+  },
+
+  // --- Dialog Boxes ---
+  {
+    topic: "Dialog Boxes",
+    q: "Which JavaScript dialog box requires the user to enter text input?",
+    opts: [
+      "alert()",
+      "confirm()",
+      "prompt()",
+      "dialog()",
+      "input()"
+    ],
+    answer: 2,
+    explain: "<strong>prompt()</strong> displays a dialog with a text input field where the user can type a response. <strong>alert()</strong> only shows a message. <strong>confirm()</strong> offers OK/Cancel buttons and returns true or false."
+  },
+  {
+    topic: "Dialog Boxes",
+    q: "What value does confirm() return when the user clicks OK?",
+    opts: [
+      "The text 'OK'",
+      "1",
+      "true",
+      "null",
+      "'confirmed'"
+    ],
+    answer: 2,
+    explain: "<strong>confirm()</strong> returns <strong>true</strong> if the user clicks OK, and <strong>false</strong> if they click Cancel. It is commonly used to confirm a destructive action like deleting data."
+  },
+
+  // --- Functions ---
+  {
+    topic: "Functions",
+    q: "Where should JavaScript functions ideally be placed in an HTML document, and why?",
+    opts: [
+      "In the &lt;footer&gt; — so they load after all content",
+      "In the &lt;head&gt; — to ensure they are loaded before being called from the body",
+      "In an external .html file — for separation of concerns",
+      "Anywhere in the &lt;body&gt; — order does not matter",
+      "Inside the &lt;style&gt; tag — alongside CSS rules"
+    ],
+    answer: 1,
+    explain: "Functions should be placed in the <strong>&lt;head&gt;</strong> to guarantee they are <strong>loaded before</strong> being called from script statements in the body. This prevents 'function not defined' errors when body elements trigger them."
+  },
+  {
+    topic: "Functions",
+    q: "What is a JavaScript function?",
+    opts: [
+      "A type of HTML element that runs automatically on page load",
+      "A collection of JavaScript statements with a single purpose that can be reused",
+      "A CSS property that animates elements",
+      "A variable that stores multiple values",
+      "A method exclusive to the DOM that handles click events"
+    ],
+    answer: 1,
+    explain: "A <strong>function</strong> is a collection of JavaScript statements that usually have a single purpose (e.g., validate a form, perform a calculation). Functions can accept parameters and be <strong>reused</strong> multiple times throughout the code."
+  },
+
+  // --- Objects ---
+  {
+    topic: "Objects & Arrays",
+    q: "How do you access the 'name' property of a JavaScript object called 'student'?",
+    opts: [
+      "student->name",
+      "student::name",
+      "student[name]",
+      "student.name",
+      "get(student, 'name')"
+    ],
+    answer: 3,
+    explain: "Object properties are accessed using <strong>dot notation</strong>: <code>student.name</code>. You can also use bracket notation: <code>student['name']</code>. Dot notation is cleaner and more commonly used when the property name is known."
+  },
+  {
+    topic: "Objects & Arrays",
+    q: "Which method adds one or more elements to the END of a JavaScript array?",
+    opts: [
+      "array.pop()",
+      "array.shift()",
+      "array.push()",
+      "array.unshift()",
+      "array.add()"
+    ],
+    answer: 2,
+    explain: "<strong>push()</strong> adds one or more elements to the <strong>end</strong> of an array and returns the new length. <code>pop()</code> removes the last element. <code>unshift()</code> adds to the start. <code>shift()</code> removes from the start."
+  },
+  {
+    topic: "Objects & Arrays",
+    q: "An array const fruits = ['apple', 'banana'] is declared with const. Can you push a new item to it?",
+    opts: [
+      "No — const arrays are completely immutable",
+      "No — you must use let to modify an array",
+      "Yes — const prevents reassigning the variable, but array contents (methods like push) can still be modified",
+      "Yes — but only if the array has fewer than 10 elements",
+      "No — you would need to delete and recreate the array"
+    ],
+    answer: 2,
+    explain: "<strong>const</strong> prevents <em>reassigning</em> the variable (e.g., <code>fruits = []</code> would fail), but the <strong>contents</strong> of the array can still be changed using methods like <code>push()</code>, <code>pop()</code>, etc."
+  },
+
+  // --- DOM ---
+  {
+    topic: "DOM",
+    q: "What does DOM stand for and what is its role in JavaScript?",
+    opts: [
+      "Document Output Method — used to generate PDF documents",
+      "Data Object Manager — manages database connections from the browser",
+      "Document Object Model — allows JavaScript to access and manipulate HTML elements",
+      "Dynamic Object Module — a plugin system for web extensions",
+      "Distributed Output Model — handles server-side rendering"
+    ],
+    answer: 2,
+    explain: "<strong>DOM</strong> stands for <strong>Document Object Model</strong>. It represents the HTML page as a tree of objects, allowing JavaScript to <strong>access, change, add, or remove</strong> HTML elements and their content dynamically."
+  },
+  {
+    topic: "DOM",
+    q: "Which JavaScript method retrieves an HTML element by its id attribute?",
+    opts: [
+      "document.getElement('id')",
+      "document.querySelector('#id')",
+      "document.getElementById('id')",
+      "document.findById('id')",
+      "document.selectById('id')"
+    ],
+    answer: 2,
+    explain: "<strong>document.getElementById('id')</strong> returns the element with the matching id. To change its text: <code>element.innerHTML = 'new text'</code>. To get a form field's value: <code>element.value</code>."
+  },
+
+  // --- Lab / Tutorial ---
+  {
+    topic: "Lab & Tutorial",
+    q: "In Lab 03, a switch(true) statement is used for form validation. What validation check triggers the alert 'Validation failed: Age must be 18 or above'?",
+    opts: [
+      "case age === 18:",
+      "case age > 18:",
+      "case age < minAge:",
+      "case age !== minAge:",
+      "case isNaN(age):"
+    ],
+    answer: 2,
+    explain: "The Lab 03 switch uses <code>switch(true)</code> with cases that evaluate boolean conditions. The case <strong><code>age &lt; minAge:</code></strong> (where minAge = 18) triggers the age validation failure alert and returns false to prevent form submission."
+  },
+  {
+    topic: "Lab & Tutorial",
+    q: "In Tutorial 03's form validation, what does 'return false' inside the onsubmit handler do?",
+    opts: [
+      "Clears all form fields immediately",
+      "Displays 'false' as a message on the page",
+      "Prevents the form from submitting and the page from refreshing",
+      "Deletes the form from the DOM",
+      "Redirects the user to the previous page"
+    ],
+    answer: 2,
+    explain: "When <code>onsubmit='return submitForm();'</code> is used, returning <strong>false</strong> from the function <strong>prevents the form submission</strong> and stops the page from refreshing. This is how JavaScript-based validation stops invalid forms from being sent."
+  },
+  {
+    topic: "Lab & Tutorial",
+    q: "In Lab 03, after successful student registration, which steps are performed to reset the form?",
+    opts: [
+      "The page is refreshed automatically using window.reload()",
+      "All input field values are set to empty strings using .value = '' and focus is returned to the Name field",
+      "The form element is deleted from the DOM and recreated",
+      "A new blank tab is opened with an empty form",
+      "The students array is cleared and all data is lost"
+    ],
+    answer: 1,
+    explain: "After a successful submission, the form is cleared by setting each field's <strong>.value = ''</strong> (e.g., <code>document.getElementById('name').value = ''</code>) and <strong>focus</strong> is returned to the Name field. Return false prevents page refresh."
+  }
+
+];
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let questions = [];
+let answered  = {};
+let mode = 'practice';
+const TOTAL = ALL_QUESTIONS.length;
+
+// ─── Mode ────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-practice').classList.toggle('active', m === 'practice');
+  document.getElementById('mode-exam').classList.toggle('active', m === 'exam');
+  document.getElementById('submit-btn').style.display = m === 'exam' ? 'inline-flex' : 'none';
+  document.getElementById('results-btn').style.display = m === 'practice' ? 'inline-flex' : 'none';
+  shuffleAndReset();
+}
+
+// ─── Shuffle ──────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleAndReset() {
+  questions = shuffle(ALL_QUESTIONS);
+  answered = {};
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+  render();
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const keys = ['A','B','C','D','E'];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-${qi}`;
+    card.style.animationDelay = `${qi * 0.04}s`;
+
+    const state = answered[qi];
+    const isAnswered = state !== undefined;
+
+    card.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">Q${(qi+1).toString().padStart(2,'0')}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.opts.map((opt, oi) => {
+          let cls = '';
+          if (isAnswered) {
+            if (oi === q.answer) cls = mode === 'practice' ? 'correct' : (state === oi ? (oi === q.answer ? 'correct' : 'wrong') : 'reveal-correct');
+            else if (oi === state && state !== q.answer) cls = 'wrong';
+          }
+          return `<button class="option ${cls}" onclick="answer(${qi},${oi})" ${isAnswered ? 'disabled' : ''}>
+            <span class="opt-key">${keys[oi]}</span>
+            <span>${opt}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="explanation ${isAnswered && mode === 'practice' ? 'show' : ''}" id="exp-${qi}">${q.explain}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ─── Answer ───────────────────────────────────────────────────────────────────
+function answer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#opts-${qi} .option`);
+  opts.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.answer) btn.classList.add('correct');
+    else if (idx === oi && oi !== q.answer) btn.classList.add('wrong');
+  });
+  if (mode === 'practice') {
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  }
+  updateStats();
+}
+
+// ─── Stats ────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  document.getElementById('stat-answered').textContent = ans;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-remaining').textContent = TOTAL - ans;
+  document.getElementById('progress-label').textContent = `${ans} / ${TOTAL} completed`;
+  document.getElementById('progress-bar').style.width = `${(ans / TOTAL) * 100}%`;
+  document.getElementById('final-total').textContent = `/ ${TOTAL}`;
+}
+
+// ─── Exam submit ──────────────────────────────────────────────────────────────
+function submitExam() {
+  questions.forEach((q, qi) => {
+    if (answered[qi] === undefined) return;
+    const opts = document.querySelectorAll(`#opts-${qi} .option`);
+    opts.forEach((btn, idx) => {
+      if (idx === q.answer) btn.classList.add('reveal-correct');
+    });
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  });
+  questions.forEach((_, qi) => {
+    document.querySelectorAll(`#opts-${qi} .option`).forEach(b => b.disabled = true);
+  });
+  showResults();
+}
+
+// ─── Results ──────────────────────────────────────────────────────────────────
+function showResults() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  const skipped = TOTAL - ans;
+  const pct = Math.round((correct / TOTAL) * 100);
+
+  document.getElementById('final-score').textContent = correct;
+  document.getElementById('result-title').textContent =
+    pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good Job!' : pct >= 40 ? '📚 Keep Studying' : '💪 Try Again!';
+  document.getElementById('result-msg').textContent =
+    `You scored ${correct} out of ${TOTAL} (${pct}%). ${skipped > 0 ? `${skipped} question(s) were skipped.` : 'All questions attempted!'}`;
+  document.getElementById('bd-correct').textContent = `✅ ${correct} Correct`;
+  document.getElementById('bd-wrong').textContent   = `❌ ${wrong} Wrong`;
+  document.getElementById('bd-skip').textContent    = `⬜ ${skipped} Skipped`;
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+shuffleAndReset();
+</script>
+</body>
+</html>

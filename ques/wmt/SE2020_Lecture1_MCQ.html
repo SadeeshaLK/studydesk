@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SE2020 – Lecture 1 MCQ | Web Technologies & Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --card: #161d2e; --border: #1f2d45;
+    --accent: #3b82f6; --accent2: #06b6d4; --gold: #f59e0b;
+    --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  .header { text-align:center; padding:3rem 0 2rem; }
+  .course-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent2); border:1px solid var(--accent2); padding:0.3rem 0.8rem; border-radius:2px; margin-bottom:1.2rem; text-transform:uppercase; }
+  h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.1; background:linear-gradient(135deg,#e2e8f0 0%,#3b82f6 60%,#06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.6rem; }
+  .subtitle { color:var(--muted); font-size:0.95rem; font-weight:300; }
+  .stats-bar { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:2rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.4rem; text-align:center; min-width:100px; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent); display:block; }
+  .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .progress-wrap { background:var(--border); border-radius:99px; height:6px; margin:1.5rem 0 2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.5s ease; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right; margin-bottom:0.4rem; }
+  .question-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; margin-bottom:1.5rem; transition:border-color 0.2s; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-card:hover { border-color:rgba(59,130,246,0.3); }
+  .q-meta { display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent2); background:rgba(6,182,212,0.1); padding:0.2rem 0.6rem; border-radius:4px; }
+  .q-topic { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .q-text { font-size:1.05rem; font-weight:500; line-height:1.6; color:var(--text); margin-bottom:1.4rem; }
+  .options { display:flex; flex-direction:column; gap:0.6rem; }
+  .option { display:flex; align-items:flex-start; gap:0.8rem; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s ease; background:transparent; text-align:left; width:100%; color:var(--dim); font-size:0.95rem; font-family:'DM Sans',sans-serif; line-height:1.5; }
+  .option:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:rgba(59,130,246,0.06); }
+  .option .opt-key { font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:4px; margin-top:1px; flex-shrink:0; opacity:0.7; }
+  .option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); color:var(--green); }
+  .option.wrong { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+  .option.reveal-correct { border-color:var(--green); background:rgba(16,185,129,0.05); color:var(--green); }
+  .option:disabled { cursor:default; }
+  .explanation { margin-top:1rem; padding:0.9rem 1rem; background:rgba(59,130,246,0.07); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:0.88rem; color:var(--dim); line-height:1.6; display:none; }
+  .explanation.show { display:block; animation:fadeUp 0.2s ease; }
+  .explanation strong { color:var(--accent2); }
+  .controls { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:2.5rem; }
+  .btn { font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; padding:0.8rem 2rem; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.03em; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--dim); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  #result-screen { display:none; text-align:center; padding:4rem 2rem; background:var(--card); border:1px solid var(--border); border-radius:16px; animation:fadeUp 0.4s ease; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:4px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 1.5rem; background:rgba(59,130,246,0.08); box-shadow:0 0 40px rgba(59,130,246,0.2); }
+  .score-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--accent); }
+  .score-total { font-size:0.8rem; color:var(--muted); }
+  .result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .result-msg { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .result-breakdown { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+  .breakdown-item { padding:0.7rem 1.2rem; border-radius:8px; font-size:0.85rem; font-weight:500; }
+  .bd-correct { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+  .bd-wrong   { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+  .bd-skip    { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid rgba(100,116,139,0.3); }
+  .mode-bar { display:flex; gap:0.5rem; justify-content:center; margin-bottom:2rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.4rem; }
+  .mode-btn { flex:1; padding:0.5rem; border:none; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .mode-btn.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  @media(max-width:600px) { .question-card{padding:1.2rem} h1{font-size:1.6rem} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="course-badge">SE2020 · Web Technologies & Mobile · SLIIT</div>
+    <h1>Lecture 1 — MCQ Prep</h1>
+    <p class="subtitle">Basics of Web, Protocols, Networking, DNS & Languages &nbsp;·&nbsp; 25 Questions &nbsp;·&nbsp; 5 Options Each</p>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('practice')" id="mode-practice">🎯 Practice (instant feedback)</button>
+    <button class="mode-btn" onclick="setMode('exam')" id="mode-exam">📝 Exam (submit at end)</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-answered">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label">Wrong</span></div>
+    <div class="stat"><span class="stat-num" id="stat-remaining">25</span><span class="stat-label">Remaining</span></div>
+  </div>
+
+  <div class="progress-label" id="progress-label">0 / 25 completed</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="quiz-container"></div>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="shuffleAndReset()">🔀 Shuffle & Restart</button>
+    <button class="btn btn-primary" onclick="submitExam()" id="submit-btn" style="display:none">Submit Exam</button>
+    <button class="btn btn-primary" onclick="showResults()" id="results-btn">📊 View Score</button>
+  </div>
+
+  <div id="result-screen">
+    <div class="score-circle">
+      <span class="score-num" id="final-score">0</span>
+      <span class="score-total" id="final-total">/ 25</span>
+    </div>
+    <div class="result-title" id="result-title">—</div>
+    <div class="result-msg" id="result-msg">—</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item bd-correct" id="bd-correct">✅ 0 Correct</div>
+      <div class="breakdown-item bd-wrong"   id="bd-wrong">❌ 0 Wrong</div>
+      <div class="breakdown-item bd-skip"    id="bd-skip">⬜ 0 Skipped</div>
+    </div>
+    <button class="btn btn-primary" onclick="shuffleAndReset()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+  // --- The Web ---
+  {
+    topic: "Basics of the Web",
+    q: "Who invented the World Wide Web and in what year?",
+    opts: [
+      "Bill Gates in 1991",
+      "Tim Berners-Lee in 1989",
+      "Vint Cerf in 1983",
+      "Steve Jobs in 1995",
+      "Linus Torvalds in 1991"
+    ],
+    answer: 1,
+    explain: "<strong>Tim Berners-Lee</strong> invented the World Wide Web in <strong>1989</strong> at CERN, originally to share research and documents across computers."
+  },
+  {
+    topic: "Basics of the Web",
+    q: "Which of the following best describes the World Wide Web (WWW)?",
+    opts: [
+      "A global network of physical computers connected by cables",
+      "A system of interlinked hypertext documents accessed via the internet using browsers",
+      "A protocol for sending emails between servers",
+      "A type of operating system for web servers",
+      "A programming language used to build websites"
+    ],
+    answer: 1,
+    explain: "The <strong>WWW</strong> is a system of interlinked hypertext documents accessed via the internet using browsers. It is a service that runs on top of the internet."
+  },
+  {
+    topic: "Basics of the Web",
+    q: "What is the key difference between the Internet and the Web?",
+    opts: [
+      "The internet is faster than the web",
+      "The web is only accessible on desktop computers",
+      "The internet is a global network of computers; the web is a service running on that network",
+      "The internet was invented after the web",
+      "There is no difference; they refer to the same thing"
+    ],
+    answer: 2,
+    explain: "The <strong>Internet</strong> is the global network of computers. The <strong>Web</strong> is just one of many services (along with FTP, email, Telnet) that run on top of the internet."
+  },
+  {
+    topic: "Client & Server",
+    q: "Which of the following is NOT an example of a web browser (client)?",
+    opts: [
+      "Google Chrome",
+      "Mozilla Firefox",
+      "Apache HTTP Server",
+      "Microsoft Edge",
+      "Opera"
+    ],
+    answer: 2,
+    explain: "<strong>Apache HTTP Server</strong> is a web server, not a browser. Browsers (clients) include Chrome, Firefox, Edge, Opera, and Safari."
+  },
+  {
+    topic: "Client & Server",
+    q: "In the client-server model, which statement is correct?",
+    opts: [
+      "The server initiates all communication with the client",
+      "Both client and server can initiate communication at any time",
+      "The client always initiates the request; the server only sends responses",
+      "The server sends HTML files without waiting for a request",
+      "Clients and servers communicate directly without protocols"
+    ],
+    answer: 2,
+    explain: "In the HTTP request-response model, the <strong>client always initiates</strong> the conversation by sending a request. The server only sends responses — it never starts communication."
+  },
+  {
+    topic: "Client & Server",
+    q: "Which of the following are examples of web server software?",
+    opts: [
+      "Chrome, Firefox, Edge, and Safari",
+      "Apache, Nginx, IIS, and Tomcat",
+      "Python, Java, PHP, and Ruby",
+      "HTML, CSS, JavaScript, and XML",
+      "FTP, SMTP, IMAP, and POP3"
+    ],
+    answer: 1,
+    explain: "<strong>Apache, Nginx, IIS, and Tomcat</strong> are all web server software. They store and serve web content to clients."
+  },
+
+  // --- Protocols ---
+  {
+    topic: "Protocols",
+    q: "What is a network protocol?",
+    opts: [
+      "A physical cable that connects two computers",
+      "A set of rules that define how data is exchanged between devices",
+      "A type of web browser used for secure connections",
+      "An IP address assigned to a server",
+      "A programming language for building web applications"
+    ],
+    answer: 1,
+    explain: "A <strong>protocol</strong> is a set of rules for data exchange that defines how communication happens between devices. Protocols enable interoperability and ensure reliability and security."
+  },
+  {
+    topic: "Protocols",
+    q: "What does HTTP stand for, and what is its primary characteristic?",
+    opts: [
+      "HyperText Transfer Protocol; it is stateful and encrypted",
+      "HyperText Transfer Protocol; it is stateless and forms the foundation of the web",
+      "High-Traffic Transport Protocol; used for large file transfers",
+      "Hyperlink and Text Transfer Protocol; used for email communication",
+      "HyperText Terminal Protocol; used to connect to remote computers"
+    ],
+    answer: 1,
+    explain: "HTTP stands for <strong>HyperText Transfer Protocol</strong>. It is the foundation of the web and is <strong>stateless</strong> — each request is independent with no memory of previous requests."
+  },
+  {
+    topic: "Protocols",
+    q: "Which port number is used by HTTPS?",
+    opts: [
+      "Port 21",
+      "Port 25",
+      "Port 80",
+      "Port 443",
+      "Port 8080"
+    ],
+    answer: 3,
+    explain: "<strong>HTTPS uses port 443</strong>. HTTP uses port 80, FTP uses port 21, and SMTP uses port 25."
+  },
+  {
+    topic: "Protocols",
+    q: "What is the difference between HTTP and HTTPS?",
+    opts: [
+      "HTTP is faster; HTTPS is slower due to extra headers",
+      "HTTP is for images only; HTTPS is for text content",
+      "HTTP has no encryption; HTTPS uses SSL/TLS to encrypt data and prevent eavesdropping",
+      "HTTP works on port 443; HTTPS works on port 80",
+      "There is no practical difference between HTTP and HTTPS"
+    ],
+    answer: 2,
+    explain: "<strong>HTTP</strong> transmits data without encryption. <strong>HTTPS</strong> uses SSL/TLS encryption to secure data in transit and prevent eavesdropping, making it trusted and secure."
+  },
+  {
+    topic: "Protocols",
+    q: "Which protocol is used for sending emails from a client to a mail server?",
+    opts: [
+      "FTP (File Transfer Protocol)",
+      "HTTP (HyperText Transfer Protocol)",
+      "IMAP (Internet Message Access Protocol)",
+      "SMTP (Simple Mail Transfer Protocol)",
+      "POP3 (Post Office Protocol version 3)"
+    ],
+    answer: 3,
+    explain: "<strong>SMTP (Simple Mail Transfer Protocol)</strong> is used for sending emails. IMAP and POP3 are used for receiving emails, with IMAP syncing across devices and POP3 downloading locally."
+  },
+  {
+    topic: "Protocols",
+    q: "What is the main difference between POP3 and IMAP for email retrieval?",
+    opts: [
+      "POP3 is more secure than IMAP",
+      "POP3 syncs emails across multiple devices; IMAP downloads emails locally",
+      "POP3 downloads emails locally; IMAP syncs emails across multiple devices",
+      "POP3 is used for sending emails; IMAP is for receiving",
+      "There is no difference between POP3 and IMAP"
+    ],
+    answer: 2,
+    explain: "<strong>POP3</strong> downloads emails to a local device (and usually removes them from the server). <strong>IMAP</strong> syncs emails across multiple devices, keeping them on the server."
+  },
+
+  // --- Networking ---
+  {
+    topic: "Networking",
+    q: "Which type of network covers the smallest geographic area, such as a home or single office building?",
+    opts: [
+      "WAN (Wide Area Network)",
+      "MAN (Metropolitan Area Network)",
+      "LAN (Local Area Network)",
+      "VPN (Virtual Private Network)",
+      "ISP (Internet Service Provider)"
+    ],
+    answer: 2,
+    explain: "A <strong>LAN (Local Area Network)</strong> covers a small area such as a home, school, office, or campus. It offers high speed (100 Mbps to 10 Gbps) and low latency."
+  },
+  {
+    topic: "Networking",
+    q: "A Metropolitan Area Network (MAN) typically covers which geographic range?",
+    opts: [
+      "A single room or floor in a building",
+      "A home or small office",
+      "A city, town, or metropolitan area (up to ~50 km)",
+      "An entire country or continent",
+      "The entire globe via undersea cables"
+    ],
+    answer: 2,
+    explain: "A <strong>MAN</strong> covers a city, town, or metropolitan area (typically up to ~50 km). It is larger than a LAN but smaller than a WAN, and is used to interconnect multiple LANs."
+  },
+  {
+    topic: "Networking",
+    q: "Which physical network topology connects all devices to a single central switch or hub?",
+    opts: [
+      "Bus topology",
+      "Ring topology",
+      "Mesh topology",
+      "Star topology",
+      "Hierarchical topology"
+    ],
+    answer: 3,
+    explain: "In a <strong>Star topology</strong>, all devices connect to a central switch or hub. It is the most common topology in modern LANs due to easy fault isolation."
+  },
+  {
+    topic: "Networking",
+    q: "In a Broadcast logical topology, how is access to the network media controlled?",
+    opts: [
+      "Only the server can send data at any time",
+      "An electronic token must be held to transmit data",
+      "Access is first come, first served — any host can broadcast at any time",
+      "Data is sent only to the intended recipient's MAC address",
+      "A central controller schedules when each device can send"
+    ],
+    answer: 2,
+    explain: "In a <strong>Broadcast topology</strong> (used by Ethernet), any host can send data at any time on a first come, first served basis. Every host receives the broadcast."
+  },
+
+  // --- IP & DNS ---
+  {
+    topic: "IP Addressing",
+    q: "How many bits does an IPv4 address contain, and how is it typically written?",
+    opts: [
+      "64 bits, written as 8 groups of hexadecimal values",
+      "32 bits, written as 4 groups of decimal numbers separated by dots",
+      "128 bits, written as 4 groups of decimal numbers separated by dots",
+      "32 bits, written as 8 groups of hexadecimal values",
+      "16 bits, written as 2 groups of decimal numbers"
+    ],
+    answer: 1,
+    explain: "An <strong>IPv4</strong> address is <strong>32 bits</strong>, broken into 4 groups of 8 bits, written as decimal numbers separated by dots (e.g., 133.27.168.125). It supports ~4.29 billion unique addresses."
+  },
+  {
+    topic: "IP Addressing",
+    q: "What is the key advantage of IPv6 over IPv4?",
+    opts: [
+      "IPv6 is faster because it uses fewer bits",
+      "IPv6 uses 128 bits, providing vastly more unique addresses (3.4 × 10³⁸)",
+      "IPv6 only requires 2 groups of numbers, making it simpler",
+      "IPv6 eliminates the need for DNS lookups",
+      "IPv6 is backward compatible and replaces MAC addresses"
+    ],
+    answer: 1,
+    explain: "<strong>IPv6</strong> uses <strong>128 bits</strong>, providing approximately 3.4 × 10³⁸ unique addresses — far more than IPv4's ~4.3 billion. This solves the IPv4 address exhaustion problem."
+  },
+  {
+    topic: "DNS",
+    q: "What does DNS stand for and what is its primary function?",
+    opts: [
+      "Data Name System; it encrypts internet traffic",
+      "Domain Name System; it translates human-readable domain names into IP addresses",
+      "Dynamic Network Service; it assigns IP addresses to devices automatically",
+      "Distributed Naming Server; it stores website files for fast delivery",
+      "Domain Navigation System; it routes packets between routers"
+    ],
+    answer: 1,
+    explain: "DNS stands for <strong>Domain Name System</strong>. It acts like the internet's phonebook, translating human-readable domain names (e.g., google.com) into IP addresses (e.g., 216.58.213.100)."
+  },
+  {
+    topic: "DNS",
+    q: "In the DNS hierarchy, which level comes immediately below the root zone?",
+    opts: [
+      "Subdomain zone (e.g., mail.google.com)",
+      "Second-level domain zone (e.g., google.com)",
+      "First-level zone / Top-Level Domain (e.g., .com, .edu, .gov)",
+      "IP address block (e.g., 192.168.x.x)",
+      "Host record (e.g., www)"
+    ],
+    answer: 2,
+    explain: "The DNS hierarchy goes: Root zone → <strong>1st level (TLDs like .com, .edu, .gov)</strong> → 2nd level (e.g., google.com) → 3rd level (e.g., drive.google.com)."
+  },
+  {
+    topic: "DNS",
+    q: "Which of the following correctly describes the components of a URL?",
+    opts: [
+      "IP address, subnet mask, gateway, and DNS server",
+      "Protocol/service, host name, subdomain, domain name, port, directory, and file name",
+      "Username, password, server name, and file path only",
+      "Browser type, OS version, server address, and page title",
+      "HTML tag, CSS class, JavaScript function, and server response code"
+    ],
+    answer: 1,
+    explain: "A URL contains: <strong>Protocol/service</strong> (http://), <strong>hostname</strong> (www), <strong>subdomain</strong>, <strong>domain name</strong>, <strong>port</strong> (:80), <strong>directory</strong>, and <strong>file name</strong> (e.g., index.html)."
+  },
+
+  // --- HTML & Markup ---
+  {
+    topic: "HTML & Markup Languages",
+    q: "What does HTML stand for?",
+    opts: [
+      "Hyperlink and Text Markup Language",
+      "High-level Text Management Language",
+      "HyperText Markup Language",
+      "Hybrid Transfer Markup Language",
+      "HyperText Mobile Language"
+    ],
+    answer: 2,
+    explain: "HTML stands for <strong>HyperText Markup Language</strong>. It is the standard language for creating web pages and defines the structure and content of a webpage using tags."
+  },
+  {
+    topic: "HTML & Markup Languages",
+    q: "Which HTML tag is used to define the largest heading on a page?",
+    opts: [
+      "&lt;head&gt;",
+      "&lt;h6&gt;",
+      "&lt;title&gt;",
+      "&lt;h1&gt;",
+      "&lt;header&gt;"
+    ],
+    answer: 3,
+    explain: "<strong>&lt;h1&gt;</strong> defines the largest heading. HTML provides six heading levels from &lt;h1&gt; (largest) to &lt;h6&gt; (smallest)."
+  },
+  {
+    topic: "HTML & Markup Languages",
+    q: "What is the purpose of the &lt;head&gt; section in an HTML document?",
+    opts: [
+      "It contains all visible text and images displayed in the browser",
+      "It defines table headers within an HTML table",
+      "It contains identifying and control information (like the title) that is NOT displayed as page content",
+      "It is used to create headings at the top of the visible page",
+      "It holds all JavaScript code for the webpage"
+    ],
+    answer: 2,
+    explain: "The <strong>&lt;head&gt;</strong> section contains meta-information about the document (title, character set, etc.) that is <strong>not displayed</strong> as visible content on the page."
+  },
+  {
+    topic: "HTML & Markup Languages",
+    q: "In HTML, what is the difference between the &lt;span&gt; and &lt;div&gt; elements?",
+    opts: [
+      "&lt;span&gt; is for images; &lt;div&gt; is for text",
+      "&lt;span&gt; is a block-level element with margins; &lt;div&gt; is inline with no line breaks",
+      "&lt;span&gt; is an inline element (no line breaks); &lt;div&gt; is a block-level element (displayed on its own line)",
+      "&lt;span&gt; is used for tables; &lt;div&gt; is used for lists",
+      "There is no functional difference between &lt;span&gt; and &lt;div&gt;"
+    ],
+    answer: 2,
+    explain: "<strong>&lt;span&gt;</strong> is an <strong>inline</strong> element — it flows within text with no line breaks. <strong>&lt;div&gt;</strong> is a <strong>block-level</strong> element — it starts on a new line with margins above and below."
+  },
+  {
+    topic: "HTML & Markup Languages",
+    q: "Which HTML tag combination is used to create an ordered (numbered) list?",
+    opts: [
+      "&lt;ul&gt; and &lt;li&gt;",
+      "&lt;dl&gt; and &lt;dt&gt;",
+      "&lt;ol&gt; and &lt;li&gt;",
+      "&lt;list&gt; and &lt;item&gt;",
+      "&lt;table&gt; and &lt;tr&gt;"
+    ],
+    answer: 2,
+    explain: "An <strong>ordered list</strong> uses <strong>&lt;ol&gt;</strong> as the container and <strong>&lt;li&gt;</strong> for each item. Items are automatically numbered. An unordered list uses &lt;ul&gt; and &lt;li&gt; for bullet points."
+  }
+
+];
+
+let questions = [], userAnswers = {}, correctCount = 0, wrongCount = 0, mode = 'practice';
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-practice').classList.toggle('active', m === 'practice');
+  document.getElementById('mode-exam').classList.toggle('active', m === 'exam');
+  document.getElementById('submit-btn').style.display = m === 'exam' ? 'inline-block' : 'none';
+  document.getElementById('results-btn').style.display = m === 'practice' ? 'inline-block' : 'none';
+  shuffleAndReset();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleAndReset() {
+  questions = shuffle(ALL_QUESTIONS);
+  userAnswers = {};
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-card-${i}`;
+    card.style.animationDelay = `${i * 0.03}s`;
+    const optsHtml = q.opts.map((opt, oi) => `
+      <button class="option" id="opt-${i}-${oi}" onclick="selectAnswer(${i}, ${oi})" ${userAnswers[i] !== undefined ? 'disabled' : ''}>
+        <span class="opt-key">${String.fromCharCode(65+oi)}</span>
+        <span>${opt}</span>
+      </button>`).join('');
+    card.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">Q${i+1}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="explanation" id="exp-${i}">💡 ${q.explain}</div>`;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function selectAnswer(qi, oi) {
+  if (userAnswers[qi] !== undefined) return;
+  userAnswers[qi] = oi;
+  const q = questions[qi];
+  const isCorrect = oi === q.answer;
+  if (mode === 'practice') {
+    q.opts.forEach((_, idx) => {
+      const btn = document.getElementById(`opt-${qi}-${idx}`);
+      btn.disabled = true;
+      if (idx === q.answer) btn.classList.add('correct');
+      else if (idx === oi && !isCorrect) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${qi}`).classList.add('show');
+    if (isCorrect) correctCount++; else wrongCount++;
+  } else {
+    const btn = document.getElementById(`opt-${qi}-${oi}`);
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+    q.opts.forEach((_, idx) => { document.getElementById(`opt-${qi}-${idx}`).disabled = true; });
+  }
+  updateStats();
+  updateProgress();
+}
+
+function updateStats() {
+  const answered = Object.keys(userAnswers).length;
+  document.getElementById('stat-answered').textContent = answered;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  document.getElementById('stat-remaining').textContent = questions.length - answered;
+}
+
+function updateProgress() {
+  const answered = Object.keys(userAnswers).length;
+  const pct = (answered / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${answered} / ${questions.length} completed`;
+}
+
+function submitExam() {
+  let correct = 0;
+  questions.forEach((q, i) => {
+    const selected = userAnswers[i];
+    q.opts.forEach((_, oi) => {
+      const btn = document.getElementById(`opt-${i}-${oi}`);
+      btn.disabled = true;
+      if (oi === q.answer) btn.classList.add('reveal-correct');
+      if (selected !== undefined && oi === selected && selected !== q.answer) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${i}`).classList.add('show');
+    if (selected === q.answer) correct++;
+  });
+  correctCount = correct;
+  wrongCount = Object.keys(userAnswers).length - correct;
+  updateStats();
+  showResults();
+}
+
+function showResults() {
+  const total = questions.length;
+  const answered = Object.keys(userAnswers).length;
+  const skipped = total - answered;
+  const pct = Math.round((correctCount / total) * 100);
+  document.getElementById('final-score').textContent = correctCount;
+  document.getElementById('final-total').textContent = `/ ${total}`;
+  document.getElementById('bd-correct').textContent = `✅ ${correctCount} Correct`;
+  document.getElementById('bd-wrong').textContent = `❌ ${wrongCount} Wrong`;
+  document.getElementById('bd-skip').textContent = `⬜ ${skipped} Skipped`;
+  let title, msg;
+  if (pct >= 85) { title = '🏆 Excellent!'; msg = "Outstanding performance! You're exam-ready."; }
+  else if (pct >= 70) { title = '👍 Good Job!'; msg = 'Solid understanding. Review the missed questions.'; }
+  else if (pct >= 50) { title = '📚 Keep Studying'; msg = "You're getting there. Focus on weak topics."; }
+  else { title = '💪 More Practice Needed'; msg = 'Review the lecture slides and retry.'; }
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-msg').textContent = msg;
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+shuffleAndReset();
+</script>
+</body>
+</html>

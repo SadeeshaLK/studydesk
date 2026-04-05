@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SE2020 – Lab 04 MCQ | HTML DOM with jQuery</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --card: #161d2e; --border: #1f2d45;
+    --accent: #3b82f6; --accent2: #06b6d4; --gold: #f59e0b;
+    --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  .header { text-align:center; padding:3rem 0 2rem; }
+  .course-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent2); border:1px solid var(--accent2); padding:0.3rem 0.8rem; border-radius:2px; margin-bottom:1.2rem; text-transform:uppercase; }
+  h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; line-height:1.1; background:linear-gradient(135deg,#e2e8f0 0%,#3b82f6 60%,#06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.6rem; }
+  .subtitle { color:var(--muted); font-size:0.95rem; font-weight:300; }
+  .stats-bar { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:2rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.4rem; text-align:center; min-width:100px; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent); display:block; }
+  .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .progress-wrap { background:var(--border); border-radius:99px; height:6px; margin:1.5rem 0 2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.5s ease; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right; margin-bottom:0.4rem; }
+  .question-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; margin-bottom:1.5rem; transition:border-color 0.2s; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-card:hover { border-color:rgba(59,130,246,0.3); }
+  .q-meta { display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent2); background:rgba(6,182,212,0.1); padding:0.2rem 0.6rem; border-radius:4px; }
+  .q-topic { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .q-text { font-size:1.05rem; font-weight:500; line-height:1.6; color:var(--text); margin-bottom:1.4rem; }
+  .q-text pre { font-family:'DM Mono',monospace; background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:8px; padding:1rem; font-size:0.82rem; color:#93c5fd; line-height:1.7; overflow-x:auto; margin:0.8rem 0; white-space:pre; }
+  .options { display:flex; flex-direction:column; gap:0.6rem; }
+  .option { display:flex; align-items:flex-start; gap:0.8rem; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s ease; background:transparent; text-align:left; width:100%; color:var(--dim); font-size:0.95rem; font-family:'DM Sans',sans-serif; line-height:1.5; }
+  .option:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:rgba(59,130,246,0.06); }
+  .option .opt-key { font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:4px; margin-top:1px; flex-shrink:0; opacity:0.7; }
+  .option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); color:var(--green); }
+  .option.wrong { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+  .option.reveal-correct { border-color:var(--green); background:rgba(16,185,129,0.05); color:var(--green); }
+  .option:disabled { cursor:default; }
+  .explanation { margin-top:1rem; padding:0.9rem 1rem; background:rgba(59,130,246,0.07); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:0.88rem; color:var(--dim); line-height:1.6; display:none; }
+  .explanation.show { display:block; animation:fadeUp 0.2s ease; }
+  .explanation strong { color:var(--accent2); }
+  .code { font-family:'DM Mono',monospace; background:rgba(0,0,0,0.3); padding:0.15rem 0.4rem; border-radius:3px; font-size:0.85em; color:#93c5fd; }
+  .controls { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:2.5rem; }
+  .btn { font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; padding:0.8rem 2rem; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.03em; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--dim); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  #result-screen { display:none; text-align:center; padding:4rem 2rem; background:var(--card); border:1px solid var(--border); border-radius:16px; animation:fadeUp 0.4s ease; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:4px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 1.5rem; background:rgba(59,130,246,0.08); box-shadow:0 0 40px rgba(59,130,246,0.2); }
+  .score-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--accent); }
+  .score-total { font-size:0.8rem; color:var(--muted); }
+  .result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .result-msg { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .result-breakdown { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+  .breakdown-item { padding:0.7rem 1.2rem; border-radius:8px; font-size:0.85rem; font-weight:500; }
+  .bd-correct { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+  .bd-wrong   { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+  .bd-skip    { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid rgba(100,116,139,0.3); }
+  .mode-bar { display:flex; gap:0.5rem; justify-content:center; margin-bottom:2rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.4rem; }
+  .mode-btn { flex:1; padding:0.5rem; border:none; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .mode-btn.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  @media(max-width:600px) { .question-card{padding:1.2rem} h1{font-size:1.6rem} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="course-badge">SE2020 · Web & Mobile Technologies · SLIIT</div>
+    <h1>Lab 04 — MCQ Prep</h1>
+    <p class="subtitle">HTML DOM with jQuery · DOM Methods, Events, jQuery, Dynamic Tables &nbsp;·&nbsp; 30 Questions &nbsp;·&nbsp; 5 Options Each</p>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('practice')" id="mode-practice">🎯 Practice (instant feedback)</button>
+    <button class="mode-btn" onclick="setMode('exam')" id="mode-exam">📝 Exam (submit at end)</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-answered">0</span><span class="stat-label">Answered</span></div>
+    <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label">Correct</span></div>
+    <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label">Wrong</span></div>
+    <div class="stat"><span class="stat-num" id="stat-remaining">30</span><span class="stat-label">Remaining</span></div>
+  </div>
+
+  <div class="progress-label" id="progress-label">0 / 30 completed</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="quiz-container"></div>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="shuffleAndReset()">🔀 Shuffle & Restart</button>
+    <button class="btn btn-primary" onclick="submitExam()" id="submit-btn" style="display:none">Submit Exam</button>
+    <button class="btn btn-primary" onclick="showResults()" id="results-btn">📊 View Score</button>
+  </div>
+
+  <div id="result-screen">
+    <div class="score-circle">
+      <span class="score-num" id="final-score">0</span>
+      <span class="score-total" id="final-total">/ 30</span>
+    </div>
+    <div class="result-title" id="result-title">—</div>
+    <div class="result-msg" id="result-msg">—</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item bd-correct" id="bd-correct">✅ 0 Correct</div>
+      <div class="breakdown-item bd-wrong"   id="bd-wrong">❌ 0 Wrong</div>
+      <div class="breakdown-item bd-skip"    id="bd-skip">⬜ 0 Skipped</div>
+    </div>
+    <button class="btn btn-primary" onclick="shuffleAndReset()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+  // ── DOM Fundamentals ──────────────────────────────────────────────────────
+  {
+    topic: "DOM Fundamentals",
+    q: "What does DOM stand for in web development?",
+    opts: [
+      "Document Object Model",
+      "Data Object Management",
+      "Dynamic Output Module",
+      "Document Oriented Markup",
+      "Design Object Method"
+    ],
+    answer: 0,
+    explain: "<strong>DOM</strong> stands for <strong>Document Object Model</strong>. It is a programming interface that represents an HTML or XML document as a tree of objects that JavaScript can read and manipulate."
+  },
+
+  {
+    topic: "DOM Fundamentals",
+    q: "Which of the following correctly describes the DOM tree structure?",
+    opts: [
+      "HTML elements are stored as flat key-value pairs",
+      "The DOM represents the page as a tree where each HTML element is a node",
+      "The DOM is only used by CSS to apply styles",
+      "The DOM tree is built only when JavaScript runs",
+      "Only &lt;body&gt; elements are included in the DOM tree"
+    ],
+    answer: 1,
+    explain: "The <strong>DOM represents the HTML document as a tree of objects</strong>. Every HTML element becomes a node in this tree. JavaScript can then access and modify these nodes to update what is rendered in the browser."
+  },
+
+  // ── DOM Methods ───────────────────────────────────────────────────────────
+  {
+    topic: "DOM Methods",
+    q: "What does the following code do?\n<pre>let title = document.getElementsByTagName(\"h1\")[0];</pre>",
+    opts: [
+      "Selects all h1 elements and stores them in an array",
+      "Selects the first &lt;h1&gt; element found in the DOM",
+      "Creates a new &lt;h1&gt; element in the document",
+      "Deletes every &lt;h1&gt; tag from the page",
+      "Returns the text content of all &lt;h1&gt; elements"
+    ],
+    answer: 1,
+    explain: "<strong>getElementsByTagName(\"h1\")</strong> returns a <em>collection</em> of all &lt;h1&gt; elements. Appending <strong>[0]</strong> accesses the first one, so the variable <code class='code'>title</code> holds a reference to the first &lt;h1&gt; node."
+  },
+
+  {
+    topic: "DOM Methods",
+    q: "Which code correctly accesses the first image on a page using a document collection?",
+    opts: [
+      "<code>document.getImage(0)</code>",
+      "<code>document.querySelector('img')[0]</code>",
+      "<code>document.images[0]</code>",
+      "<code>document.getElementById('img')</code>",
+      "<code>document.image.first()</code>"
+    ],
+    answer: 2,
+    explain: "<strong>document.images</strong> is a built-in DOM collection that holds all &lt;img&gt; elements on the page. Using <strong>[0]</strong> retrieves the first image — exactly the same way an array index works."
+  },
+
+  {
+    topic: "DOM Methods",
+    q: "What is returned by <code>document.forms[0]</code>?",
+    opts: [
+      "The HTML source code of the first form",
+      "A reference to the first &lt;form&gt; element in the document",
+      "The number of forms on the page",
+      "The value of every input inside the first form",
+      "A NodeList of all input elements"
+    ],
+    answer: 1,
+    explain: "<strong>document.forms</strong> is a collection of all &lt;form&gt; elements. <strong>document.forms[0]</strong> returns a reference to the very first form element, which can then be used to read inputs or attach event handlers."
+  },
+
+  // ── Document Object Properties ────────────────────────────────────────────
+  {
+    topic: "Document Properties",
+    q: "What does the following code accomplish?\n<pre>window.onload = function () {\n    console.log(\"Page URL:\", document.URL);\n    document.title = \"Travel Adventures - DOM Lab\";\n};</pre>",
+    opts: [
+      "Runs immediately when the script tag is parsed, then changes the URL",
+      "Waits for the full page to load, logs the URL, then updates the browser tab title",
+      "Prevents the page from loading until the title is set",
+      "Redirects the browser to a new URL after setting the title",
+      "Logs the page title and changes the URL in the address bar"
+    ],
+    answer: 1,
+    explain: "<strong>window.onload</strong> delays execution until the entire page is loaded. <strong>document.URL</strong> returns the current page address, which is logged. <strong>document.title</strong> sets the text shown in the browser tab — here it becomes <em>\"Travel Adventures - DOM Lab\"</em>."
+  },
+
+  {
+    topic: "Document Properties",
+    q: "Which property returns the date and time a web document was last modified?",
+    opts: [
+      "document.createdDate",
+      "document.modified",
+      "document.lastModified",
+      "document.updateTime",
+      "window.fileDate"
+    ],
+    answer: 2,
+    explain: "<strong>document.lastModified</strong> returns a string with the date and time the document was last modified. It is a read-only property of the document object."
+  },
+
+  // ── DOM Style Object ───────────────────────────────────────────────────────
+  {
+    topic: "DOM Style Object",
+    q: "What is the correct JavaScript syntax to set the font size of an element to 36px?",
+    opts: [
+      "<code>element.style.font-size = \"36px\";</code>",
+      "<code>element.css(\"font-size\", \"36px\");</code>",
+      "<code>element.style.fontSize = \"36px\";</code>",
+      "<code>element.setStyle(fontSize, 36);</code>",
+      "<code>element.fontSize = \"36px\";</code>"
+    ],
+    answer: 2,
+    explain: "CSS property names with hyphens are written in <strong>camelCase</strong> in JavaScript. So <code class='code'>font-size</code> becomes <strong>fontSize</strong>. The correct syntax is <code class='code'>element.style.fontSize = \"36px\";</code>."
+  },
+
+  {
+    topic: "DOM Style Object",
+    q: "Look at the code below. What will happen after the page loads?\n<pre>title.style.color = \"darkblue\";\ntitle.style.fontSize = \"36px\";\ntitle.style.fontFamily = \"Arial\";</pre>",
+    opts: [
+      "A CSS file is generated and linked to the page",
+      "The browser reloads to apply the new styles",
+      "The &lt;h1&gt; element's appearance is updated immediately without a page reload",
+      "The styles are queued and applied on the next user click",
+      "An error occurs because font-family must be set in CSS"
+    ],
+    answer: 2,
+    explain: "Modifying <strong>element.style</strong> properties applies CSS changes <em>immediately</em> in the browser without any page reload. The DOM is updated live, so the visual change is instant."
+  },
+
+  // ── setTimeout ────────────────────────────────────────────────────────────
+  {
+    topic: "setTimeout",
+    q: "What does the following code do?\n<pre>setTimeout(function () {\n    document.body.style.backgroundColor = \"#5490c5ff\";\n}, 2000);</pre>",
+    opts: [
+      "Changes the background color immediately when the page loads",
+      "Changes the background color after a 2-second delay",
+      "Loops every 2 seconds changing the background color",
+      "Changes the background color of only the first element",
+      "Throws an error because setTimeout cannot change styles"
+    ],
+    answer: 1,
+    explain: "<strong>setTimeout(fn, 2000)</strong> schedules the function to run <strong>once</strong> after <strong>2000 milliseconds (2 seconds)</strong>. When it runs, it sets the entire page's background color via <code class='code'>document.body.style.backgroundColor</code>."
+  },
+
+  // ── Mouse Events ──────────────────────────────────────────────────────────
+  {
+    topic: "Mouse Events",
+    q: "What does this code do when the user moves the mouse over the image?\n<pre>image.onmouseover = function () {\n    image.style.border = \"5px solid orange\";\n};</pre>",
+    opts: [
+      "The image is hidden from the page",
+      "The image source changes to a different file",
+      "A 5px solid orange border appears around the image",
+      "An alert box shows the image filename",
+      "The mouse cursor changes to a pointer"
+    ],
+    answer: 2,
+    explain: "<strong>onmouseover</strong> fires when the mouse pointer enters the element. Setting <code class='code'>image.style.border = \"5px solid orange\"</code> dynamically adds a visible orange border around the image."
+  },
+
+  {
+    topic: "Mouse Events",
+    q: "Which event removes the image border when the mouse pointer leaves the image?\n<pre>image.onmouseout = function () {\n    image.style.border = \"______\";\n};</pre>",
+    opts: [
+      "\"0\"",
+      "\"hidden\"",
+      "\"none\"",
+      "\"transparent\"",
+      "\"remove\""
+    ],
+    answer: 2,
+    explain: "Setting <strong>border</strong> to <code class='code'>\"none\"</code> removes the border entirely. <strong>onmouseout</strong> triggers when the pointer leaves the element, so this restores the image to its original borderless state."
+  },
+
+  // ── Keyboard Events ────────────────────────────────────────────────────────
+  {
+    topic: "Keyboard Events",
+    q: "What does this code do?\n<pre>document.getElementById(\"name\").onkeyup = function () {\n    this.style.backgroundColor = \"#ed4c6aff\";\n};</pre>",
+    opts: [
+      "Changes the name field's background color each time a key is pressed and released",
+      "Validates the input field when the user submits the form",
+      "Prevents the user from typing in the name field",
+      "Changes the color of the text typed by the user",
+      "Focuses the name field when a key is pressed anywhere on the page"
+    ],
+    answer: 0,
+    explain: "<strong>onkeyup</strong> fires every time a keyboard key is released inside the element. <code class='code'>this.style.backgroundColor</code> changes the input's background color — providing immediate visual feedback while the user types."
+  },
+
+  {
+    topic: "Keyboard Events",
+    q: "Which keyboard event fires while a key is being held down (before it is released)?",
+    opts: [
+      "onkeyup",
+      "onkeypress",
+      "onkeydown",
+      "onkeyhold",
+      "onkeychange"
+    ],
+    answer: 2,
+    explain: "<strong>onkeydown</strong> fires the moment a key is pressed and held. <strong>onkeyup</strong> fires when the key is released. <strong>onkeypress</strong> (deprecated) fired between the two for character keys."
+  },
+
+  // ── Form Events ───────────────────────────────────────────────────────────
+  {
+    topic: "Form Events",
+    q: "What is the purpose of <code>event.preventDefault()</code> in the code below?\n<pre>form.onsubmit = function (event) {\n    event.preventDefault();\n    addTraveler();\n};</pre>",
+    opts: [
+      "It validates all input fields before submission",
+      "It stops the browser from refreshing or navigating away on form submit",
+      "It encrypts the form data before sending it",
+      "It prevents the user from typing in any form field",
+      "It clears the form fields automatically"
+    ],
+    answer: 1,
+    explain: "By default, submitting a form causes a full page reload. <strong>event.preventDefault()</strong> cancels this default browser behaviour, allowing JavaScript (here <code class='code'>addTraveler()</code>) to handle the data dynamically without refreshing the page."
+  },
+
+  {
+    topic: "Form Events",
+    q: "Which event triggers when a form is submitted?",
+    opts: [
+      "onchange",
+      "onsubmit",
+      "onclick",
+      "onfocus",
+      "onreset"
+    ],
+    answer: 1,
+    explain: "<strong>onsubmit</strong> is the form event that fires when the user submits the form — either by clicking a submit button or pressing Enter in an input field."
+  },
+
+  // ── addEventListener ───────────────────────────────────────────────────────
+  {
+    topic: "addEventListener",
+    q: "What does the following code do?\n<pre>let costTable = document.getElementById(\"costTable\");\ncostTable.addEventListener(\"click\", function () {\n    alert(\"You clicked on the Trip Cost table!\");\n});</pre>",
+    opts: [
+      "Adds a row to the table when it is clicked",
+      "Displays an alert box whenever the user clicks anywhere inside the cost table",
+      "Highlights the table border on click",
+      "Deletes the table when clicked",
+      "Prevents any click events on the table"
+    ],
+    answer: 1,
+    explain: "<strong>addEventListener(\"click\", fn)</strong> attaches a click listener to the table element. Every time the user clicks inside the table, the callback fires and <strong>alert()</strong> shows the message."
+  },
+
+  {
+    topic: "addEventListener",
+    q: "Which of the following is a key advantage of using <code>addEventListener()</code> over <code>element.onclick = fn</code>?",
+    opts: [
+      "addEventListener() works only in Google Chrome",
+      "addEventListener() is faster because it runs before the DOM loads",
+      "Multiple listeners can be attached to the same element without overwriting each other",
+      "addEventListener() automatically prevents default browser actions",
+      "addEventListener() only works with mouse events"
+    ],
+    answer: 2,
+    explain: "When you assign <code class='code'>element.onclick = fn</code>, any previously assigned handler is overwritten. <strong>addEventListener()</strong> allows <em>multiple</em> independent handlers to be attached to the same event on the same element."
+  },
+
+  // ── Image Preloading ──────────────────────────────────────────────────────
+  {
+    topic: "Image Preloading",
+    q: "What does the following code achieve?\n<pre>let img2 = new Image();\nimg2.src = \"./images/travel1.jpg\";</pre>",
+    opts: [
+      "Creates a visible &lt;img&gt; element and appends it to the page",
+      "Loads the image into the browser cache in the background before it is displayed",
+      "Replaces the current page image with travel1.jpg immediately",
+      "Validates whether the image file exists on the server",
+      "Sets the alt text of the existing image to travel1.jpg"
+    ],
+    answer: 1,
+    explain: "<strong>new Image()</strong> creates an image object in memory (not yet visible on the page). Setting its <strong>src</strong> tells the browser to start downloading the image in the background. When the image is later displayed, it loads instantly from the browser cache."
+  },
+
+  {
+    topic: "Image Preloading",
+    q: "What happens when this code executes and the user double-clicks the image?\n<pre>image.ondblclick = function () {\n    image.src = img2.src;\n};</pre>",
+    opts: [
+      "The image is removed from the DOM",
+      "A new browser tab opens with img2",
+      "The displayed image is swapped to the preloaded img2 source",
+      "The image doubles in size",
+      "An alert shows the image path"
+    ],
+    answer: 2,
+    explain: "<strong>ondblclick</strong> fires on a double-click. Assigning <code class='code'>image.src = img2.src</code> changes the <strong>src</strong> attribute of the visible image to the preloaded one, effectively swapping the displayed picture without a page reload."
+  },
+
+  // ── Dynamic Table (DOM Manipulation) ─────────────────────────────────────
+  {
+    topic: "Dynamic Table",
+    q: "In the addTraveler() function, what does <code>table.insertRow()</code> do?",
+    opts: [
+      "Creates a new &lt;table&gt; element on the page",
+      "Adds a new &lt;tr&gt; (table row) at the end of the existing table",
+      "Inserts a new column into the table",
+      "Deletes the last row of the table",
+      "Replaces all existing rows with a single new row"
+    ],
+    answer: 1,
+    explain: "<strong>table.insertRow()</strong> inserts a new <strong>&lt;tr&gt;</strong> element at the end of the table (or at a specified index) and returns a reference to it. You then use <code class='code'>insertCell()</code> on that row to add cells."
+  },
+
+  {
+    topic: "Dynamic Table",
+    q: "What does this portion of the addTraveler() function accomplish?\n<pre>let btn = document.createElement(\"button\");\nbtn.innerText = \"Delete\";\nbtn.onclick = function () {\n    table.deleteRow(row.rowIndex);\n};</pre>",
+    opts: [
+      "Creates a button that submits the form when clicked",
+      "Creates a Delete button that removes its own table row when clicked",
+      "Creates a button that clears all rows from the table",
+      "Creates a button that navigates to a new page",
+      "Creates a hidden button that logs the row data to the console"
+    ],
+    answer: 1,
+    explain: "<strong>document.createElement(\"button\")</strong> creates a new button element. Its <strong>onclick</strong> handler calls <code class='code'>table.deleteRow(row.rowIndex)</code>, which removes <em>only the specific row</em> that contains the button — achieved because <code class='code'>row.rowIndex</code> holds the live index of that row."
+  },
+
+  {
+    topic: "Dynamic Table",
+    q: "After inserting data into the table, the form is cleared with:\n<pre>form.reset();</pre>\nWhat does this method do?",
+    opts: [
+      "Reloads the entire page",
+      "Deletes the form element from the DOM",
+      "Resets all input fields inside the form to their default (empty) values",
+      "Submits the form a second time with empty values",
+      "Hides the form from the user"
+    ],
+    answer: 2,
+    explain: "<strong>form.reset()</strong> clears all input fields within the form, restoring them to their initial default values. This provides a clean state for the user to enter the next record."
+  },
+
+  // ── Object Events ─────────────────────────────────────────────────────────
+  {
+    topic: "Object Events",
+    q: "What does this code do?\n<pre>window.onresize = function () {\n    console.log(\"Window resized\");\n};</pre>",
+    opts: [
+      "Resizes the browser window to a fixed size on page load",
+      "Logs a message to the console every time the browser window is resized",
+      "Prevents the user from resizing the browser window",
+      "Saves the window dimensions to localStorage on resize",
+      "Triggers a page reload whenever the window is resized"
+    ],
+    answer: 1,
+    explain: "<strong>window.onresize</strong> is an object-level event that fires whenever the browser window is resized by the user. The callback here logs <em>\"Window resized\"</em> to the browser console each time the event fires."
+  },
+
+  // ── jQuery ────────────────────────────────────────────────────────────────
+  {
+    topic: "jQuery",
+    q: "Which jQuery code correctly changes the page title color to dark green and its font size to 34px?",
+    opts: [
+      "<code>$(\"#pageTitle\").style.color = \"#147d1b\";</code>",
+      "<code>$(\"#pageTitle\").css({ color: \"#147d1b\", fontSize: \"34px\" });</code>",
+      "<code>document.getElementById(\"pageTitle\").color = \"#147d1b\";</code>",
+      "<code>$(\"#pageTitle\").setStyle(\"color\", \"#147d1b\");</code>",
+      "<code>jQuery.style(\"#pageTitle\", { color: \"#147d1b\" });</code>"
+    ],
+    answer: 1,
+    explain: "In jQuery, <strong>.css()</strong> is used to get or set CSS properties. Passing an object literal allows multiple properties to be set at once: <code class='code'>$(\"#pageTitle\").css({ color: \"#147d1b\", fontSize: \"34px\" });</code>"
+  },
+
+  {
+    topic: "jQuery",
+    q: "How do you correctly wait for the full page to load before running jQuery code?",
+    opts: [
+      "<code>jQuery.onload(function(){ ... });</code>",
+      "<code>window.start(function(){ ... });</code>",
+      "<code>$(document).ready(function(){ ... });</code>",
+      "<code>$(page).load(function(){ ... });</code>",
+      "<code>document.onstart = function(){ ... };</code>"
+    ],
+    answer: 2,
+    explain: "<strong>$(document).ready(fn)</strong> is the standard jQuery way to execute code only after the DOM is fully loaded and ready to be manipulated. It is equivalent to <code class='code'>window.onload</code> but fires earlier (before images finish loading)."
+  },
+
+  {
+    topic: "jQuery",
+    q: "Which jQuery code adds a 5px solid blue border to an image when the mouse hovers over it, and removes it when the mouse leaves?\n",
+    opts: [
+      "<code>$(\"#libraryImage\").hover(function(){ $(this).border(\"5px solid blue\"); });</code>",
+      "<code>$(\"#libraryImage\").mouseover(function(){ $(this).css(\"border\",\"5px solid #0000ff\"); }).mouseout(function(){ $(this).css(\"border\",\"none\"); });</code>",
+      "<code>$(\"#libraryImage\").onmouseover(\"border\",\"5px solid blue\");</code>",
+      "<code>$(\"#libraryImage\").style.border = \"5px solid blue\";</code>",
+      "<code>$(\"#libraryImage\").addEvent(\"mouseover\", \"border:5px solid blue\");</code>"
+    ],
+    answer: 1,
+    explain: "jQuery's <strong>.mouseover()</strong> and <strong>.mouseout()</strong> chain allows different handlers for each direction of mouse movement. Inside each, <strong>$(this).css()</strong> applies or removes the border dynamically."
+  },
+
+  {
+    topic: "jQuery",
+    q: "Which jQuery code prevents a form with id <code>bookingForm</code> from refreshing the page on submit?",
+    opts: [
+      "<code>$(\"#bookingForm\").stop();</code>",
+      "<code>$(\"#bookingForm\").disable();</code>",
+      "<code>$(\"#bookingForm\").on(\"submit\", function(e){ e.preventDefault(); });</code>",
+      "<code>$(\"#bookingForm\").submit = false;</code>",
+      "<code>$(\"#bookingForm\").cancel(\"submit\");</code>"
+    ],
+    answer: 2,
+    explain: "Using <strong>.on(\"submit\", fn)</strong> attaches a submit handler in jQuery. Inside the callback, <strong>e.preventDefault()</strong> stops the browser's default form submission behaviour (which would cause a page reload)."
+  },
+
+  {
+    topic: "jQuery",
+    q: "Which jQuery code correctly reads the value from an input field with id <code>studentName</code>?",
+    opts: [
+      "<code>$(\"#studentName\").text()</code>",
+      "<code>$(\"#studentName\").html()</code>",
+      "<code>$(\"#studentName\").val()</code>",
+      "<code>$(\"#studentName\").src()</code>",
+      "<code>$(\"#studentName\").content()</code>"
+    ],
+    answer: 2,
+    explain: "<strong>.val()</strong> is the jQuery method used to get or set the value of form input elements such as text fields, selects, and checkboxes. <code class='code'>.text()</code> and <code class='code'>.html()</code> are used for element content, not input values."
+  },
+
+  {
+    topic: "jQuery",
+    q: "In the In-Class Test, the image toggle requirement states: double-clicking should swap images, and double-clicking again should swap back. Which approach correctly implements this?\n",
+    opts: [
+      "Use two separate ondblclick handlers — one for each image",
+      "Use a flag variable to track the current image, toggling the src on each double-click",
+      "Use setTimeout to alternate images every 2 seconds",
+      "Use window.onload to swap images automatically",
+      "Use form.reset() to restore the original image"
+    ],
+    answer: 1,
+    explain: "A <strong>boolean flag</strong> (e.g. <code class='code'>let isSwapped = false;</code>) tracks which image is currently showing. On each double-click, you check the flag: if false, swap to image2 and set it true; if true, swap back to image1 and set it false. This is the cleanest toggle pattern."
+  }
+
+];
+
+// ─── Engine ───────────────────────────────────────────────────────────────────
+let questions = [], answered = {}, mode = 'practice';
+const TOTAL = ALL_QUESTIONS.length;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-practice').classList.toggle('active', m === 'practice');
+  document.getElementById('mode-exam').classList.toggle('active', m === 'exam');
+  document.getElementById('submit-btn').style.display = m === 'exam' ? 'inline-flex' : 'none';
+  document.getElementById('results-btn').style.display = m === 'practice' ? 'inline-flex' : 'none';
+  shuffleAndReset();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleAndReset() {
+  questions = shuffle(ALL_QUESTIONS);
+  answered = {};
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+  render();
+}
+
+function render() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const keys = ['A','B','C','D','E'];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-${qi}`;
+    card.style.animationDelay = `${qi * 0.04}s`;
+
+    const state = answered[qi];
+    const isAnswered = state !== undefined;
+
+    card.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">Q${(qi+1).toString().padStart(2,'0')}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.opts.map((opt, oi) => {
+          let cls = '';
+          if (isAnswered) {
+            if (oi === q.answer) cls = mode === 'practice' ? 'correct' : (state === oi ? (oi === q.answer ? 'correct' : 'wrong') : 'reveal-correct');
+            else if (oi === state && state !== q.answer) cls = 'wrong';
+          }
+          return `<button class="option ${cls}" onclick="answer(${qi},${oi})" ${isAnswered ? 'disabled' : ''}>
+            <span class="opt-key">${keys[oi]}</span>
+            <span>${opt}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="explanation ${isAnswered && mode === 'practice' ? 'show' : ''}" id="exp-${qi}">${q.explain}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#opts-${qi} .option`);
+  opts.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.answer) btn.classList.add('correct');
+    else if (idx === oi && oi !== q.answer) btn.classList.add('wrong');
+  });
+  if (mode === 'practice') {
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  document.getElementById('stat-answered').textContent = ans;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-remaining').textContent = TOTAL - ans;
+  document.getElementById('progress-label').textContent = `${ans} / ${TOTAL} completed`;
+  document.getElementById('progress-bar').style.width = `${(ans / TOTAL) * 100}%`;
+  document.getElementById('final-total').textContent = `/ ${TOTAL}`;
+}
+
+function submitExam() {
+  questions.forEach((q, qi) => {
+    if (answered[qi] === undefined) return;
+    const opts = document.querySelectorAll(`#opts-${qi} .option`);
+    opts.forEach((btn, idx) => {
+      if (idx === q.answer) btn.classList.add('reveal-correct');
+    });
+    document.getElementById(`exp-${qi}`).classList.add('show');
+  });
+  questions.forEach((_, qi) => {
+    document.querySelectorAll(`#opts-${qi} .option`).forEach(b => b.disabled = true);
+  });
+  showResults();
+}
+
+function showResults() {
+  const ans = Object.keys(answered).length;
+  const correct = Object.entries(answered).filter(([qi, oi]) => questions[qi]?.answer === oi).length;
+  const wrong = ans - correct;
+  const skipped = TOTAL - ans;
+  const pct = Math.round((correct / TOTAL) * 100);
+
+  document.getElementById('final-score').textContent = correct;
+  document.getElementById('result-title').textContent =
+    pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good Job!' : pct >= 40 ? '📚 Keep Studying' : '💪 Try Again!';
+  document.getElementById('result-msg').textContent =
+    `You scored ${correct} out of ${TOTAL} (${pct}%). ${skipped > 0 ? `${skipped} question(s) were skipped.` : 'All questions attempted!'}`;
+  document.getElementById('bd-correct').textContent = `✅ ${correct} Correct`;
+  document.getElementById('bd-wrong').textContent   = `❌ ${wrong} Wrong`;
+  document.getElementById('bd-skip').textContent    = `⬜ ${skipped} Skipped`;
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollIntoView({ behavior: 'smooth' });
+}
+
+shuffleAndReset();
+</script>
+</body>
+</html>

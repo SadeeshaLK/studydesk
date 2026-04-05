@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web and Mobile Technology - SE2020 | Model Paper 2</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2336;
+    --border: #2a2f45;
+    --accent: #4f8ef7;
+    --accent2: #f7734f;
+    --green: #3dd68c;
+    --purple: #b47cff;
+    --text: #e8eaf2;
+    --muted: #6e748a;
+    --code-bg: #0d1120;
+    --keyword: #79c0ff;
+    --string: #f4a259;
+    --tag: #7ce4c8;
+    --attr: #a8d8a8;
+    --fn: #d2a8ff;
+    --nm: #ffd080;
+    --mark: #f7734f22;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .exam-header {
+    background: linear-gradient(135deg, #131929 0%, #0f1421 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 52px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .header-glow {
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(79,142,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-glow2 {
+    position: absolute;
+    bottom: -60px; left: 40%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(247,115,79,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .institute {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .course-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+  }
+  .sub-info {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sub-info span { color: rgba(255,255,255,0.45); }
+  .meta-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: right;
+    min-width: 160px;
+  }
+  .meta-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .meta-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .meta-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.9;
+  }
+  .meta-sub span { color: var(--text); font-weight: 500; }
+
+  /* Notice bar */
+  .notice-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 52px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .notice-item {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .notice-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .notice-dot.orange { background: var(--accent2); }
+  .notice-dot.green { background: var(--green); }
+  .notice-item strong { color: var(--text); }
+
+  /* Body */
+  .exam-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 72px;
+  }
+
+  /* Section */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 36px 0 20px;
+  }
+  .section-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-name {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Question card */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .q-card:hover {
+    border-color: #3a4060;
+    box-shadow: 0 0 30px rgba(79,142,247,0.06);
+  }
+  .q-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .q-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .q-tags {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .tag-single { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.25); }
+  .tag-multi  { background: rgba(247,115,79,0.15);  color: var(--accent2); border: 1px solid rgba(247,115,79,0.25); }
+  .tag-marks  { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; }
+
+  .q-content {
+    padding: 22px 22px 18px;
+  }
+  .q-stem {
+    font-size: 14.5px;
+    line-height: 1.72;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .q-stem code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    color: var(--tag);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+  .q-stem strong { color: #fff; }
+
+  /* Code block */
+  .codeblock {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin: 12px 0 18px;
+    overflow-x: auto;
+  }
+  .codeblock pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.72;
+    color: #c9d1d9;
+    white-space: pre;
+  }
+  .kw { color: var(--keyword); }
+  .str { color: var(--string); }
+  .tg { color: var(--tag); }
+  .at { color: var(--attr); }
+  .fn { color: var(--fn); }
+  .nm { color: var(--nm); }
+  .cm { color: #555d6e; font-style: italic; }
+  .num { color: #79c0ff; }
+
+  /* Options */
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .opt:hover { background: var(--surface2); border-color: #3a4060; }
+  .opt-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 1px 7px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .opt-body code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    color: var(--tag);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  /* Roman list */
+  .roman { list-style: none; margin: 8px 0 14px 4px; }
+  .roman li {
+    font-size: 13.5px;
+    color: var(--text);
+    padding: 3px 0;
+    display: flex;
+    gap: 10px;
+  }
+  .roman li .ri {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: 12px;
+    min-width: 22px;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 20px;
+    font-size: 11.5px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+  footer strong { color: rgba(255,255,255,0.6); }
+
+  @media (max-width: 600px) {
+    .exam-header { padding: 24px 18px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .notice-bar { padding: 10px 18px; }
+    .exam-body { padding: 24px 12px 48px; }
+    .q-content { padding: 16px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="exam-header">
+  <div class="header-glow"></div>
+  <div class="header-glow2"></div>
+  <div class="header-grid">
+    <div>
+      <div class="institute">Sri Lanka Institute of Information Technology</div>
+      <div class="course-name">Web and Mobile Technology</div>
+      <div class="sub-info">SE2020 <span>·</span> Mid Examination <span>·</span> Model Paper 02 <span>·</span> 2026</div>
+    </div>
+    <div class="meta-box">
+      <div class="meta-label">Total Marks</div>
+      <div class="meta-value">14</div>
+      <div class="meta-sub">
+        Questions: <span>14</span><br>
+        Duration: <span>1 Hour</span><br>
+        Sections: <span>4</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notice-bar">
+  <div class="notice-item"><span class="notice-dot"></span>Read each question carefully before selecting.</div>
+  <div class="notice-item"><span class="notice-dot orange"></span><strong>Multi-select</strong> questions may have more than one correct answer.</div>
+  <div class="notice-item"><span class="notice-dot green"></span>All questions carry equal marks unless stated otherwise.</div>
+</div>
+
+<div class="exam-body">
+
+  <!-- SECTION A -->
+  <div class="section-header">
+    <div class="section-pill">Section A</div>
+    <div class="section-line"></div>
+    <div class="section-name">HTML — Structure &amp; Forms</div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 01</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which HTML element is used to define a <strong>clickable button</strong>?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>&lt;click&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>&lt;input type="button"&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>&lt;button&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">Both b and c are correct.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">None of the above.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 02</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="q-type tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Consider the HTML snippet below. What is the correct output?</p>
+      <div class="codeblock"><pre><span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+  <span class="tg">&lt;p&gt;</span>This is <span class="tg">&lt;b&gt;</span>bold<span class="tg">&lt;/b&gt;</span> and <span class="tg">&lt;i&gt;</span>italic<span class="tg">&lt;/i&gt;</span> text.<span class="tg">&lt;/p&gt;</span>
+  <span class="tg">&lt;p&gt;</span>Line <span class="tg">&lt;br&gt;</span> Break here.<span class="tg">&lt;/p&gt;</span>
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">The word "bold" will be bold and "italic" will be italicized.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>&lt;br&gt;</code> inserts a new paragraph, not a line break.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body">"Line" and "Break here." appear on the same line.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">The code produces a syntax error because <code>&lt;br&gt;</code> is not closed.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">None of the above.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 03</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which of the following correctly creates an HTML dropdown (select) menu with three options?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>&lt;input type="dropdown"&gt;&lt;option&gt;A&lt;/option&gt;&lt;/input&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>&lt;select&gt;&lt;option&gt;A&lt;/option&gt;&lt;option&gt;B&lt;/option&gt;&lt;option&gt;C&lt;/option&gt;&lt;/select&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>&lt;dropdown&gt;&lt;item&gt;A&lt;/item&gt;&lt;/dropdown&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>&lt;list&gt;&lt;option&gt;A&lt;/option&gt;&lt;/list&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">None of the above.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 04</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-multi">Multi Select</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which of the following are <strong>semantic HTML5 elements</strong>?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>&lt;header&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>&lt;div&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>&lt;article&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>&lt;section&gt;</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body"><code>&lt;span&gt;</code></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION B -->
+  <div class="section-header">
+    <div class="section-pill">Section B</div>
+    <div class="section-line"></div>
+    <div class="section-name">CSS — Layout, Selectors &amp; Box Model</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 05</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">What is the correct CSS to make all <code>&lt;p&gt;</code> elements inside a <code>&lt;div&gt;</code> with class <code>content</code> have a font size of 16px?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>div.content &gt; p { font-size: 16px; }</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>.content p { font-size: 16px; }</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>p.content { font-size: 16px; }</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>#content p { font-size: 16px; }</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">Both a and b are correct.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 06</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-multi">Multi Select</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Examine the CSS below. Which statements are <strong>correct</strong>?</p>
+      <div class="codeblock"><pre><span class="tg">&lt;style&gt;</span>
+  <span class="nm">.box</span> {
+    <span class="at">width</span>: <span class="str">200px</span>;
+    <span class="at">padding</span>: <span class="str">20px</span>;
+    <span class="at">border</span>: <span class="str">5px solid black</span>;
+    <span class="at">margin</span>: <span class="str">10px</span>;
+    <span class="at">box-sizing</span>: <span class="str">content-box</span>;
+  }
+<span class="tg">&lt;/style&gt;</span></pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">The total rendered width of the box is 250px.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body">With <code>box-sizing: content-box</code>, padding and border are added outside the width.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body">With <code>box-sizing: border-box</code>, the total width would remain 200px including padding and border.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">The margin is included inside the 200px width.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">The <code>padding</code> property adds space between the content and the border.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 07</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which CSS property is used to make a flex container arrange its children <strong>in a row</strong>?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>flex-direction: column;</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>display: grid;</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>display: flex; flex-direction: row;</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>align-items: row;</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body"><code>float: left;</code></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION C -->
+  <div class="section-header">
+    <div class="section-pill">Section C</div>
+    <div class="section-line"></div>
+    <div class="section-name">JavaScript — DOM, Events &amp; Logic</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 08</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">What is the output of the following JavaScript code?</p>
+      <div class="codeblock"><pre><span class="kw">for</span> (<span class="kw">var</span> <span class="nm">i</span> = <span class="num">0</span>; <span class="nm">i</span> &lt; <span class="num">3</span>; <span class="nm">i</span>++) {
+  <span class="cm">// nothing</span>
+}
+<span class="fn">console</span>.log(<span class="nm">i</span>);</pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>0</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>2</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>3</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>undefined</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">ReferenceError: <code>i</code> is not defined</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 09</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-multi">Multi Select</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Consider the following JavaScript code. Which statements are <strong>correct</strong>?</p>
+      <div class="codeblock"><pre><span class="kw">let</span> <span class="nm">obj</span> = {
+  <span class="at">name</span>: <span class="str">"Alice"</span>,
+  <span class="at">age</span>: <span class="num">22</span>,
+  <span class="fn">greet</span>: <span class="kw">function</span>() {
+    <span class="kw">return</span> <span class="str">"Hi, I am "</span> + <span class="kw">this</span>.<span class="nm">name</span>;
+  }
+};
+<span class="fn">console</span>.log(<span class="nm">obj</span>.<span class="fn">greet</span>());
+<span class="fn">console</span>.log(<span class="nm">obj</span>[<span class="str">"age"</span>]);</pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>obj.greet()</code> outputs <code>"Hi, I am Alice"</code>.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>obj["age"]</code> outputs <code>22</code>.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>this.name</code> inside the method refers to the global window object.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">Object properties can be accessed using both dot notation and bracket notation.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">The code produces a TypeError because functions cannot be inside objects.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 10</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">What will the following code print to the console?</p>
+      <div class="codeblock"><pre><span class="kw">let</span> <span class="nm">a</span> = <span class="num">10</span>;
+<span class="kw">let</span> <span class="nm">b</span> = <span class="num">3</span>;
+<span class="fn">console</span>.log(<span class="nm">a</span> % <span class="nm">b</span>);
+<span class="fn">console</span>.log(<span class="nm">a</span> ** <span class="nm">b</span>);
+<span class="fn">console</span>.log(Math.<span class="fn">floor</span>(<span class="nm">a</span> / <span class="nm">b</span>));</pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body"><code>1 &nbsp; 1000 &nbsp; 3</code></span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body"><code>3 &nbsp; 30 &nbsp; 3</code></span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>1 &nbsp; 30 &nbsp; 3</code></span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>0 &nbsp; 1000 &nbsp; 3</code></span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">Syntax error — <code>**</code> is not valid JavaScript</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 11</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-multi">Multi Select</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Look at the code below. Which statements correctly describe what happens when the button is clicked?</p>
+      <div class="codeblock"><pre><span class="tg">&lt;button</span> <span class="at">id</span>=<span class="str">"btn"</span><span class="tg">&gt;</span>Click Me<span class="tg">&lt;/button&gt;</span>
+<span class="tg">&lt;p</span> <span class="at">id</span>=<span class="str">"msg"</span><span class="tg">&gt;</span>Hello<span class="tg">&lt;/p&gt;</span>
+
+<span class="tg">&lt;script&gt;</span>
+  document.<span class="fn">getElementById</span>(<span class="str">"btn"</span>)
+    .<span class="fn">addEventListener</span>(<span class="str">"click"</span>, <span class="kw">function</span>() {
+      <span class="kw">let</span> <span class="nm">p</span> = document.<span class="fn">getElementById</span>(<span class="str">"msg"</span>);
+      <span class="nm">p</span>.<span class="at">textContent</span> = <span class="str">"Clicked!"</span>;
+      <span class="nm">p</span>.<span class="at">style.color</span> = <span class="str">"red"</span>;
+    });
+<span class="tg">&lt;/script&gt;</span></pre></div>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">The paragraph text changes from "Hello" to "Clicked!" when the button is clicked.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body">The text color of the paragraph becomes red after clicking.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body"><code>textContent</code> modifies the HTML structure of the paragraph.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body"><code>addEventListener</code> is used to attach a click event to the button.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">The button disappears after being clicked.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION D -->
+  <div class="section-header">
+    <div class="section-pill">Section D</div>
+    <div class="section-line"></div>
+    <div class="section-name">Web Theories, Protocols &amp; Concepts</div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 12</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which of the following correctly describes the role of a <strong>web browser</strong>?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">It stores web pages on a remote server.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body">It interprets HTML, CSS and JavaScript to render web pages for the user.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body">It acts as a server that responds to HTTP requests.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">It only handles the display of images on a website.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">None of the above.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 13</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-single">Single</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which of the following best describes the difference between <strong>client-side</strong> and <strong>server-side</strong> scripting?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">Client-side scripts run on the web server; server-side scripts run in the browser.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body">Client-side scripts run in the user's browser; server-side scripts run on the web server.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body">Both client-side and server-side scripts always run in the browser.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">JavaScript is a server-side scripting language only.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">There is no difference between client-side and server-side scripting.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-top">
+      <span class="q-id">Question 14</span>
+      <div class="q-tags">
+        <span class="tag tag-marks">1.00 mark</span>
+        <span class="tag tag-multi">Multi Select</span>
+      </div>
+    </div>
+    <div class="q-content">
+      <p class="q-stem">Which of the following are <strong>true</strong> about cookies in web development?</p>
+      <div class="opts">
+        <div class="opt"><span class="opt-key">a.</span><span class="opt-body">Cookies are stored on the client's browser.</span></div>
+        <div class="opt"><span class="opt-key">b.</span><span class="opt-body">Cookies can be used to maintain session information between requests.</span></div>
+        <div class="opt"><span class="opt-key">c.</span><span class="opt-body">Cookies are always encrypted and secure by default.</span></div>
+        <div class="opt"><span class="opt-key">d.</span><span class="opt-body">Cookies can have an expiry date set.</span></div>
+        <div class="opt"><span class="opt-key">e.</span><span class="opt-body">Cookies are stored permanently and cannot be deleted.</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Web and Mobile Technology — SE2020</strong> &nbsp;·&nbsp; Model Paper 02 · 2026 &nbsp;·&nbsp; SLIIT &nbsp;·&nbsp; For practice purposes only
+</footer>
+
+</body>
+</html>
