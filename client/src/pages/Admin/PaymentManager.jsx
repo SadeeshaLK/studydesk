@@ -308,13 +308,13 @@ const PaymentManager = () => {
             <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: 8, overflow: 'hidden' }}>
               {selectedSlip.slipUrl?.toLowerCase().endsWith('.pdf') ? (
                 <iframe 
-                  src={selectedSlip.slipUrl} 
+                  src={selectedSlip.slipUrl.startsWith('http') ? selectedSlip.slipUrl : `https://studydesk-zw7c.onrender.com${selectedSlip.slipUrl}`}
                   style={{ width: '100%', height: '60vh', border: 'none' }} 
                   title="Payment Slip PDF"
                 />
               ) : (
                 <Image
-                  src={selectedSlip.slipUrl}
+                  src={selectedSlip.slipUrl.startsWith('http') ? selectedSlip.slipUrl : `https://studydesk-zw7c.onrender.com${selectedSlip.slipUrl}`}
                   alt="Payment Slip"
                   style={{ maxHeight: '60vh', objectFit: 'contain' }}
                   fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
