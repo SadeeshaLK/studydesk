@@ -112,15 +112,31 @@ exports.purchaseQuiz = async (req, res) => {
       return res.status(400).json({ message: 'This quiz is free. No purchase required.' });
     }
 
-    // Check if already purchased
-    const existingPurchase = await Payment.findOne({
+    // Check if already purchased — allow re-purchase if attempts exhausted
+    const existingPurchases = await Payment.find({
       student: req.user._id,
       quiz: quizId,
       type: 'purchase',
       status: 'completed'
-    });
-    if (existingPurchase) {
-      return res.status(400).json({ message: 'You have already purchased this quiz.' });
+    }).sort({ paidAt: -1 });
+
+    if (existingPurchases.length > 0) {
+      // Find latest purchase date
+      const latestPurchase = existingPurchases[0];
+      const latestPurchaseDate = latestPurchase.paidAt || latestPurchase.createdAt;
+
+      // Count attempts since last purchase
+      const Submission = require('../models/Submission');
+      const attemptsSinceLastPurchase = await Submission.countDocuments({
+        student: req.user._id,
+        quiz: quizId,
+        createdAt: { $gte: latestPurchaseDate }
+      });
+
+      if (attemptsSinceLastPurchase < quiz.maxAttempts) {
+        return res.status(400).json({ message: 'You still have attempts remaining from your last purchase.' });
+      }
+      // If attempts exhausted, allow re-purchase (fall through)
     }
 
     // Check wallet balance

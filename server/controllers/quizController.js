@@ -182,31 +182,54 @@ exports.getAvailableQuizzes = async (req, res) => {
     // Get attempt counts and purchase status for each quiz
     const studentId = req.user._id;
     const [submissions, purchases] = await Promise.all([
-      Submission.find({ student: studentId }).select('quiz'),
-      Payment.find({ student: studentId, type: 'purchase', status: 'completed' }).select('quiz')
+      Submission.find({ student: studentId }).select('quiz createdAt'),
+      Payment.find({ student: studentId, type: 'purchase', status: 'completed' }).select('quiz paidAt createdAt')
     ]);
 
-    const attemptCountMap = {};
-    submissions.forEach(s => {
-      const qid = s.quiz.toString();
-      attemptCountMap[qid] = (attemptCountMap[qid] || 0) + 1;
+    // Build a map of quizId -> latest purchase date
+    const latestPurchaseMap = {};
+    purchases.forEach(p => {
+      const qid = p.quiz.toString();
+      const purchaseDate = p.paidAt || p.createdAt;
+      if (!latestPurchaseMap[qid] || purchaseDate > latestPurchaseMap[qid]) {
+        latestPurchaseMap[qid] = purchaseDate;
+      }
     });
 
     const paidQuizIds = new Set(purchases.map(p => p.quiz.toString()));
 
     const quizzesWithStatus = quizzes.map(q => {
       const qid = q._id.toString();
-      const attemptCount = attemptCountMap[qid] || 0;
       const hasPaid = paidQuizIds.has(qid);
+      const latestPurchaseDate = latestPurchaseMap[qid];
+
+      // Count attempts only since the latest purchase (for paid quizzes)
+      let attemptCount = 0;
+      submissions.forEach(s => {
+        if (s.quiz.toString() !== qid) return;
+        if (q.pricingType === 'paid' && latestPurchaseDate) {
+          // Only count attempts after the latest purchase
+          const subDate = s.createdAt;
+          if (subDate >= latestPurchaseDate) {
+            attemptCount++;
+          }
+        } else {
+          attemptCount++;
+        }
+      });
+
       const canAttempt = attemptCount < q.maxAttempts;
-      const needsPayment = q.pricingType === 'paid' && !hasPaid;
+      const attemptsExhausted = attemptCount >= q.maxAttempts;
+      // Needs payment if: paid quiz AND (never purchased OR attempts exhausted after last purchase)
+      const needsPayment = q.pricingType === 'paid' && (!hasPaid || attemptsExhausted);
 
       return {
         ...q.toObject(),
         attemptCount,
         hasPaid,
         canAttempt,
-        needsPayment
+        needsPayment,
+        attemptsExhausted
       };
     });
 
@@ -229,26 +252,32 @@ exports.getQuizForAttempt = async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found or not available.' });
     }
 
-    // Check attempt limit
-    const attemptCount = await Submission.countDocuments({ 
-      student: req.user._id, 
-      quiz: req.params.id 
-    });
-    if (attemptCount >= quiz.maxAttempts) {
-      return res.status(400).json({ message: `Maximum attempts (${quiz.maxAttempts}) reached for this quiz.` });
-    }
-
-    // Check purchase for paid quizzes
+    // Check purchase for paid quizzes and determine attempt window
+    let attemptSinceDate = null;
     if (quiz.pricingType === 'paid') {
-      const purchase = await Payment.findOne({ 
+      const latestPurchase = await Payment.findOne({ 
         student: req.user._id, 
         quiz: req.params.id, 
         type: 'purchase',
         status: 'completed' 
-      });
-      if (!purchase) {
+      }).sort({ paidAt: -1 });
+      if (!latestPurchase) {
         return res.status(403).json({ message: 'You need to purchase this quiz first.' });
       }
+      attemptSinceDate = latestPurchase.paidAt || latestPurchase.createdAt;
+    }
+
+    // Check attempt limit (count only since latest purchase for paid quizzes)
+    const attemptQuery = { 
+      student: req.user._id, 
+      quiz: req.params.id 
+    };
+    if (attemptSinceDate) {
+      attemptQuery.createdAt = { $gte: attemptSinceDate };
+    }
+    const attemptCount = await Submission.countDocuments(attemptQuery);
+    if (attemptCount >= quiz.maxAttempts) {
+      return res.status(400).json({ message: `Maximum attempts (${quiz.maxAttempts}) reached for this quiz.` });
     }
 
     // Build questions — shuffle if enabled
@@ -271,7 +300,7 @@ exports.getQuizForAttempt = async (req, res) => {
         marks: q.marks
       };
 
-      if (q.questionType === 'mcq' || q.questionType === 'true-false') {
+      if (q.questionType === 'mcq' || q.questionType === 'true-false' || q.questionType === 'dropdown') {
         let options = q.options.map(opt => ({ _id: opt._id, text: opt.text }));
         // Shuffle MCQ options when shuffle is enabled (not true-false)
         if (quiz.shuffleQuestions && q.questionType === 'mcq') {

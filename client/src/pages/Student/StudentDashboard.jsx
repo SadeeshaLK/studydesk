@@ -91,6 +91,15 @@ const StudentDashboard = () => {
     }
 
     if (!quiz.canAttempt) {
+      // Paid quizzes: allow re-purchase to reset attempts
+      if (quiz.pricingType === 'paid' && quiz.attemptsExhausted) {
+        return (
+          <Button type="primary" icon={<ShoppingCartOutlined />} onClick={() => handleQuizAction({ ...quiz, needsPayment: true })}
+            style={{ background: 'linear-gradient(135deg, #722ed1, #eb2f96)', borderColor: '#722ed1' }}>
+            Buy Again · LKR {quiz.price?.toLocaleString()}
+          </Button>
+        );
+      }
       return (
         <Tag color="default" style={{ padding: '4px 12px', fontSize: 13 }}>
           <CheckCircleOutlined /> Max Attempts ({quiz.maxAttempts}) Reached

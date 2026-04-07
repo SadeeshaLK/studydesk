@@ -16,8 +16,22 @@ exports.submitQuiz = async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found.' });
     }
 
-    // Check attempt limit
-    const attemptCount = await Submission.countDocuments({ student: req.user._id, quiz: quizId });
+    // Check attempt limit (respect purchase windows for paid quizzes)
+    let attemptQuery = { student: req.user._id, quiz: quizId };
+    if (quiz.pricingType === 'paid') {
+      const Payment = require('../models/Payment');
+      const latestPurchase = await Payment.findOne({
+        student: req.user._id,
+        quiz: quizId,
+        type: 'purchase',
+        status: 'completed'
+      }).sort({ paidAt: -1 });
+      if (latestPurchase) {
+        const sinceDate = latestPurchase.paidAt || latestPurchase.createdAt;
+        attemptQuery.createdAt = { $gte: sinceDate };
+      }
+    }
+    const attemptCount = await Submission.countDocuments(attemptQuery);
     if (attemptCount >= quiz.maxAttempts) {
       return res.status(400).json({ message: `Maximum attempts (${quiz.maxAttempts}) reached for this quiz.` });
     }
@@ -33,7 +47,8 @@ exports.submitQuiz = async (req, res) => {
 
       switch (question.questionType) {
         case 'mcq':
-        case 'true-false': {
+        case 'true-false':
+        case 'dropdown': {
           if (question.isMultiSelect) {
             const correctOptionIds = question.options.filter(opt => opt.isCorrect).map(opt => opt._id.toString());
             const selectedOptionIds = answer.selectedOptions || [];
