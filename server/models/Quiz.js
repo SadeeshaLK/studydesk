@@ -8,7 +8,7 @@ const questionSchema = new mongoose.Schema({
   },
   questionType: {
     type: String,
-    enum: ['mcq', 'true-false', 'short-answer'],
+    enum: ['mcq', 'true-false', 'short-answer', 'dropdown'],
     required: [true, 'Question type is required']
   },
   isMultiSelect: {

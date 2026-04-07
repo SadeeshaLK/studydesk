@@ -1,0 +1,43 @@
+﻿node : TypeError: pdf is 
+not a function
+At line:1 char:1
++ node extract_pdf.js 
+2>&1 | Out-File -Encoding 
+utf8 ip_content.txt
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (T  
+  ypeError: pdf is not    
+ a function:String) []    
+, RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+    at extractAll (F:\Stud
+yDesk\server\extract_pdf.j
+s:10:24)
+    at Object.<anonymous> 
+(F:\StudyDesk\server\extra
+ct_pdf.js:17:1)
+    at Module._compile (no
+de:internal/modules/cjs/lo
+ader:1812:14)
+    at Object..js (node:in
+ternal/modules/cjs/loader:
+1943:10)
+    at Module.load (node:i
+nternal/modules/cjs/loader
+:1533:32)
+    at Module._load (node:
+internal/modules/cjs/loade
+r:1335:12)
+    at wrapModuleLoad (nod
+e:internal/modules/cjs/loa
+der:255:19)
+    at Module.executeUserE
+ntryPoint [as runMain] (no
+de:internal/modules/run_ma
+in:154:5)
+    at node:internal/main/
+run_main_module:33:47

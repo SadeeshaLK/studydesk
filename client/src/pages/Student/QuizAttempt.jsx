@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Button, Radio, Checkbox, Input, Modal, Spin, message, Space } from 'antd';
+import { Button, Radio, Checkbox, Input, Modal, Spin, message, Space, Select } from 'antd';
 import {
   ClockCircleOutlined,
   WarningOutlined,
@@ -345,6 +345,23 @@ const QuizAttempt = () => {
                   </Space>
                 </Radio.Group>
               )
+            )}
+
+            {/* Dropdown Answer */}
+            {question.questionType === 'dropdown' && (
+              <Select
+                placeholder="Select your answer"
+                style={{ width: '100%' }}
+                value={answers[question._id]?.selectedOption}
+                onChange={(value) => handleAnswer(question._id, value)}
+                size="large"
+              >
+                {question.options.map(opt => (
+                  <Select.Option key={opt._id} value={opt._id}>
+                    {opt.text}
+                  </Select.Option>
+                ))}
+              </Select>
             )}
 
             {/* Short Answer */}
