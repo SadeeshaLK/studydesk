@@ -293,7 +293,7 @@ const QuizAttempt = () => {
                   style={{ width: '100%' }}
                 >
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    {question.options.map(opt => {
+                    {question.options?.map(opt => {
                       const isSelected = (answers[question._id]?.selectedOptions || []).includes(opt._id);
                       return (
                         <Checkbox 
@@ -324,7 +324,7 @@ const QuizAttempt = () => {
                   style={{ width: '100%' }}
                 >
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    {question.options.map(opt => (
+                    {question.options?.map(opt => (
                       <Radio 
                         key={opt._id} 
                         value={opt._id}
@@ -356,7 +356,7 @@ const QuizAttempt = () => {
                 onChange={(value) => handleAnswer(question._id, value)}
                 size="large"
               >
-                {question.options.map(opt => (
+                {question.options?.map(opt => (
                   <Select.Option key={opt._id} value={opt._id}>
                     {opt.text}
                   </Select.Option>
