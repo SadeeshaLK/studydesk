@@ -7,6 +7,8 @@ import ProtectedRoute from './components/Common/ProtectedRoute';
 import AppLayout from './components/Layout/AppLayout';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
+import ForgotPasswordPage from './pages/Auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/Auth/ResetPasswordPage';
 import StudentDashboard from './pages/Student/StudentDashboard';
 import QuizAttempt from './pages/Student/QuizAttempt';
 import QuizResult from './pages/Student/QuizResult';
@@ -44,6 +46,12 @@ const AppRoutes = () => {
       } />
       <Route path="/register" element={
         user ? <Navigate to={getDefaultPath(user.role)} /> : <RegisterPage />
+      } />
+      <Route path="/forgot-password" element={
+        user ? <Navigate to={getDefaultPath(user.role)} /> : <ForgotPasswordPage />
+      } />
+      <Route path="/reset-password" element={
+        user ? <Navigate to={getDefaultPath(user.role)} /> : <ResetPasswordPage />
       } />
 
       {/* Student Routes */}

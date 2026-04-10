@@ -21,4 +21,16 @@ router.post('/login', [
 // @route   GET /api/auth/me
 router.get('/me', authenticate, authController.getMe);
 
+// @route   POST /api/auth/forgot-password
+router.post('/forgot-password', [
+  body('email').isEmail().withMessage('Please enter a valid email')
+], authController.forgotPassword);
+
+// @route   POST /api/auth/reset-password
+router.post('/reset-password', [
+  body('email').isEmail().withMessage('Please enter a valid email'),
+  body('code').trim().notEmpty().withMessage('Reset code is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], authController.resetPassword);
+
 module.exports = router;

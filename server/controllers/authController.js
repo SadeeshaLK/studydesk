@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
-const { sendEmail, registrationEmail } = require('../utils/emailService');
+const { sendEmail, registrationEmail, passwordResetEmail } = require('../utils/emailService');
 
 // Generate JWT
 const generateToken = (userId) => {
@@ -107,5 +108,89 @@ exports.getMe = async (req, res) => {
   } catch (error) {
     console.error('GetMe error:', error);
     res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+// @desc    Request password reset
+// @route   POST /api/auth/forgot-password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return res.json({ message: 'If an account with that email exists, a reset code has been sent.' });
+    }
+
+    // Generate 6-digit reset code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash and store the code with 1-hour expiry
+    const hashedToken = crypto.createHash('sha256').update(resetCode).digest('hex');
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+    await user.save({ validateModifiedOnly: true });
+
+    // Send email (non-blocking)
+    sendEmail(email, passwordResetEmail(user.name, resetCode)).catch(() => {});
+
+    res.json({ message: 'If an account with that email exists, a reset code has been sent.' });
+  } catch (error) {
+    console.error('ForgotPassword error:', error);
+    res.status(500).json({ message: 'Server error during password reset request.' });
+  }
+};
+
+// @desc    Reset password with code
+// @route   POST /api/auth/reset-password
+exports.resetPassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const { email, code, password } = req.body;
+
+    // Hash the provided code to compare
+    const hashedToken = crypto.createHash('sha256').update(code).digest('hex');
+
+    const user = await User.findOne({
+      email,
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    }).select('+resetPasswordToken +resetPasswordExpires');
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset code.' });
+    }
+
+    // Update password and clear reset fields
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    const token = generateToken(user._id);
+
+    res.json({
+      message: 'Password reset successful!',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('ResetPassword error:', error);
+    res.status(500).json({ message: 'Server error during password reset.' });
   }
 };

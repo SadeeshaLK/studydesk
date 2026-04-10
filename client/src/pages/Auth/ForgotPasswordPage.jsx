@@ -1,24 +1,26 @@
 import { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import api from '../../api/axios';
 
-const LoginPage = () => {
+const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [sent, setSent] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const user = await login(values.email, values.password);
-      message.success(`${t('login')} successful!`);
-      navigate(user.role === 'lecturer' ? '/lecturer/dashboard' : '/student/dashboard');
+      await api.post('/auth/forgot-password', { email: values.email });
+      setSent(true);
+      message.success(t('reset_code_sent'));
+      // Navigate to reset page with email pre-filled
+      navigate('/reset-password', { state: { email: values.email } });
     } catch (error) {
-      message.error(error.response?.data?.message || 'Login failed');
+      message.error(error.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -33,10 +35,10 @@ const LoginPage = () => {
         </div>
 
         <h2 style={{ textAlign: 'center', marginBottom: 4, fontSize: 22, fontWeight: 700 }}>
-          {t('login_title')}
+          {t('forgot_password_title')}
         </h2>
-        <p style={{ textAlign: 'center', marginBottom: 28, color: 'var(--text-secondary)', fontSize: 14 }}>
-          {t('login_subtitle')}
+        <p style={{ textAlign: 'center', marginBottom: 28, color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6 }}>
+          {t('forgot_password_subtitle')}
         </p>
 
         <Form layout="vertical" onFinish={onFinish} size="large" autoComplete="off">
@@ -51,37 +53,22 @@ const LoginPage = () => {
             <Input prefix={<MailOutlined />} placeholder="you@university.edu" />
           </Form.Item>
 
-          <Form.Item 
-            name="password" 
-            label={t('password')}
-            rules={[{ required: true, message: 'Please enter your password' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: 8 }}>
-            <div style={{ textAlign: 'right' }}>
-              <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>
-                {t('forgot_password')}
-              </Link>
-            </div>
-          </Form.Item>
-
           <Form.Item style={{ marginBottom: 16 }}>
-            <Button type="primary" htmlType="submit" block loading={loading} 
+            <Button type="primary" htmlType="submit" block loading={loading}
               style={{ height: 46, fontSize: 15, fontWeight: 600 }}>
-              {t('login')}
+              {t('send_reset_code')}
             </Button>
           </Form.Item>
         </Form>
 
         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: 14 }}>
-          {t('no_account')}{' '}
-          <Link to="/register" style={{ fontWeight: 600 }}>{t('register')}</Link>
+          <Link to="/login" style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <ArrowLeftOutlined /> {t('back_to_login')}
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default ForgotPasswordPage;

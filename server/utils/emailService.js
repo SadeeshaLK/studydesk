@@ -257,6 +257,36 @@ const quizResultEmail = (userName, quizTitle, score, totalMarks, percentage, pas
   };
 };
 
+// 5. Password Reset Email
+const passwordResetEmail = (userName, resetCode) => {
+  const content = `
+    <h2 style="color:#1a1a2e;margin:0 0 8px;font-size:22px;">Password Reset Request 🔐</h2>
+    <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
+      Hi <strong style="color:#333;">${userName}</strong>, we received a request to reset your password.
+      Use the code below to set a new password.
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9ff;border:2px dashed #667eea;border-radius:12px;padding:28px;margin-bottom:20px;text-align:center;">
+      <tr><td>
+        <p style="color:#888;font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Your Reset Code</p>
+        <p style="color:#1a1a2e;font-size:36px;font-weight:800;letter-spacing:6px;margin:0;font-family:'Courier New',monospace;">${resetCode}</p>
+      </td></tr>
+    </table>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:16px;margin-bottom:20px;">
+      <tr><td>
+        <p style="color:#ed6c02;font-size:13px;margin:0;line-height:1.5;">
+          ⚠️ This code expires in <strong>1 hour</strong>. If you didn't request this, please ignore this email — your password will remain unchanged.
+        </p>
+      </td></tr>
+    </table>
+  `;
+  return {
+    subject: '🔐 StudyDesk — Password Reset Code',
+    html: baseTemplate(content, `Your password reset code is ${resetCode}.`)
+  };
+};
+
 // ========== SEND EMAIL FUNCTION ==========
 const sendEmail = async (to, emailData) => {
   // Skip if Resend API key is not configured
@@ -292,5 +322,6 @@ module.exports = {
   registrationEmail,
   paymentSubmittedEmail,
   paymentApprovedEmail,
-  quizResultEmail
+  quizResultEmail,
+  passwordResetEmail
 };
