@@ -16,6 +16,27 @@ const app = express();
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+  frameguard: false, // Disable X-Frame-Options to allow iframes
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:", "https://*"],
+      connectSrc: ["'self'", "https://*", "http://localhost:*"],
+      frameSrc: ["'self'", "blob:", "data:"],
+      frameAncestors: [
+        "'self'", 
+        "https://studydesk.space", 
+        "https://studydesk-chi.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
 }));
 
 // CORS
